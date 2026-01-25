@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIRKMARK - Dashboard</title>
+    <link rel="stylesheet" href="styles-dashboard.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar izquierdo -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-sidebar">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="30" width="50" height="40" rx="5" fill="#4169E1" stroke="#4169E1" stroke-width="2"/>
+                        <path d="M40 45 L50 55 L60 45" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="30" y="70" width="40" height="3" rx="1.5" fill="#4169E1"/>
+                    </svg>
+                </div>
+                <h2>KIRKMARK</h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-item active" data-section="dashboard">🏠 Inicio</a></li>
+                    <li><a href="#" class="nav-item" data-section="ventas">💰 Ventas</a></li>
+                    <li><a href="#" class="nav-item" data-section="historial">📜 Historial</a></li>
+                    <li><a href="#" class="nav-item" data-section="productos">📦 Productos</a></li>
+                    <li><a href="#" class="nav-item" data-section="inventario">📊 Inventario</a></li>
+                    <li id="nav-empleados" style="display: none;"><a href="#" class="nav-item" data-section="empleados">👔 Empleados</a></li>
+                    <li id="nav-usuarios" style="display: none;"><a href="#" class="nav-item" data-section="usuarios">👥 Usuarios</a></li>
+                    <li><a href="#" class="nav-item" data-section="reportes">📈 Reports</a></li>
+                    <li id="nav-configuracion" style="display: none;"><a href="#" class="nav-item" data-section="ajustes">⚙️ Ajustes</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <!-- Navbar superior -->
+            <nav class="navbar">
+                <div class="navbar-left">
+                    <div class="breadcrumb" id="breadcrumb">
+                        <span class="breadcrumb-item">Inicio</span>
+                    </div>
+                </div>
+                <div class="navbar-right">
+                    <button class="navbar-icon">🔔</button>
+                    <div class="navbar-user-info">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%234169E1'/%3E%3Ctext x='12' y='15' font-size='10' fill='white' text-anchor='middle'%3EAD%3C/text%3E%3C/svg%3E" alt="Avatar" class="user-avatar">
+                        <div class="user-details">
+                            <span class="user-name" id="usuario-nombre">Admin</span>
+                            <span class="user-role" id="usuario-rol">Administrador</span>
+                        </div>
+                    </div>
+                    <button onclick="cerrarSesion()" class="btn-logout-navbar">Salir</button>
+                </div>
+            </nav>
+
+            <!-- Contenedor de secciones -->
+            <div class="content-container">
+                <!-- Sección Dashboard -->
+                <section id="dashboard-section" class="section active">
+                    <div class="section-header">
+                        <h1>Bienvenido al Dashboard</h1>
+                        <p>Sistema de Gestión de Ventas KIRKMARK</p>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="card-icon">📊</div>
+                            <h3>Resumen de Ventas</h3>
+                            <p class="card-value">$0.00</p>
+                            <p class="card-label">Hoy</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-icon">📦</div>
+                            <h3>Productos</h3>
+                            <p class="card-value">0</p>
+                            <p class="card-label">En inventario</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-icon">👥</div>
+                            <h3>Clientes</h3>
+                            <p class="card-value">0</p>
+                            <p class="card-label">Registrados</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-icon">📈</div>
+                            <h3>Transacciones</h3>
+                            <p class="card-value">0</p>
+                            <p class="card-label">Este mes</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección Ventas -->
+                <section id="ventas-section" class="section" style="display: none;">
+                    <div class="section-header-bar">
+                        <div>
+                            <span class="breadcrumb-nav">Ventas</span>
+                            <h1>Nueva Venta</h1>
+                        </div>
+                        <button class="btn-back" onclick="volverAtras()">← Volver</button>
+                    </div>
+                    <div class="section-content ventas-content">
+                        <!-- Búsqueda de productos -->
+                        <div class="busqueda-productos">
+                            <div class="search-box">
+                                <input 
+                                    type="text" 
+                                    id="buscar-producto" 
+                                    placeholder="🔍 Escanear código de barras o escribir el nombre del producto..."
+                                    class="input-busqueda"
+                                    onkeyup="buscarProductos(this.value)"
+                                >
+                            </div>
+                            <div id="resultados-busqueda" class="resultados-busqueda" style="display: none;">
+                                <div id="lista-resultados"></div>
+                            </div>
+                        </div>
+
+                        <div class="venta-container">
+                            <!-- Productos seleccionados -->
+                            <div class="productos-seleccionados">
+                                <h2>Productos Seleccionados</h2>
+                                <div class="tabla-productos">
+                                    <table class="tabla-data">
+                                        <thead>
+                                            <tr>
+                                                <th>Código</th>
+                                                <th>Nombre</th>
+                                                <th>Precio Unitario</th>
+                                                <th>Cantidad</th>
+                                                <th>Subtotal</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="productos-venta-lista">
+                                            <tr><td colspan="6" style="text-align: center; color: #999;">No hay productos seleccionados</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Resumen de venta -->
+                            <div class="resumen-venta">
+                                <h2>Resumen de Venta</h2>
+                                
+                                <div class="resumen-item">
+                                    <span>Subtotal:</span>
+                                    <span class="resumen-valor" id="subtotal">Bs. 0.00</span>
+                                </div>
+
+                                <div class="resumen-item resumen-total">
+                                    <span>Total:</span>
+                                    <span class="resumen-valor" id="total">Bs. 0.00</span>
+                                </div>
+
+                                <div class="metodo-pago-section">
+                                    <h3>Método de Pago</h3>
+                                    <div class="metodos-pago">
+                                        <button class="metodo-btn" data-metodo="1" onclick="seleccionarMetodoPago(1)">
+                                            <span class="metodo-icon">�</span>
+                                            <span class="metodo-nombre">Efectivo</span>
+                                        </button>
+                                        <button class="metodo-btn" data-metodo="2" onclick="seleccionarMetodoPago(2)">
+                                            <span class="metodo-icon">💳</span>
+                                            <span class="metodo-nombre">Tarjeta Débito</span>
+                                        </button>
+                                        <button class="metodo-btn" data-metodo="3" onclick="seleccionarMetodoPago(3)">
+                                            <span class="metodo-icon">💳</span>
+                                            <span class="metodo-nombre">Tarjeta Crédito</span>
+                                        </button>
+                                    </div>
+                                    <input type="hidden" id="metodo-pago-seleccionado" value="">
+                                </div>
+
+                                <button class="btn-finalizar-venta" onclick="finalizarVenta()" id="btn-finalizar">
+                                    ✓ Finalizar Venta
+                                </button>
+                                <button class="btn-cancel" onclick="cancelarVenta()">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección Historial -->
+                <section id="historial-section" class="section" style="display: none;">
+                    <div class="section-header-bar">
+                        <div>
+                            <span class="breadcrumb-nav">Historial</span>
+                            <h1>Historial de Ventas</h1>
+                        </div>
+                        <button class="btn-back" onclick="volverAtras()">← Volver</button>
+                    </div>
+                    <div class="section-content">
+                        <div class="tabla-productos">
+                            <table class="tabla-data">
+                                <thead>
+                                    <tr>
+                                        <th>ID Venta</th>
+                                        <th>Fecha</th>
+                                        <th>Vendedor</th>
+                                        <th>Productos</th>
+                                        <th>Total</th>
+                                        <th>Método Pago</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historial-ventas-lista">
+                                    <tr><td colspan="6" style="text-align: center;">Cargando historial...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección Productos -->
+                <section id="productos-section" class="section" style="display: none;">
+                    <div class="section-header-bar">
+                        <div>
+                            <span class="breadcrumb-nav">Productos</span>
+                            <h1>Gestión de Productos</h1>
+                        </div>
+                        <button class="btn-back" onclick="volverAtras()">← Volver</button>
+                    </div>
+                    <div class="section-content">
+                        <button class="btn-primary" onclick="abrirFormularioProducto()">+ Nuevo Producto</button>
+                        
+                        <!-- Modal para crear/editar producto -->
+                        <div id="modal-producto" class="modal" style="display: none;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 id="modal-titulo">Nuevo Producto</h2>
+                                    <button class="btn-close" onclick="cerrarModalProducto()">×</button>
+                                </div>
+                                <form id="form-producto" class="form-usuario">
+                                    <div class="form-group">
+                                        <label for="producto-nombre">Nombre del Producto *</label>
+                                        <input type="text" id="producto-nombre" placeholder="Ej. Coca-Cola 500ml" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="producto-categoria">Categoría *</label>
+                                        <select id="producto-categoria" required>
+                                            <option value="">Seleccione una categoría</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="producto-precio">Precio Unitario *</label>
+                                        <input type="number" id="producto-precio" placeholder="0.00" step="0.01" required>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-primary">Guardar Producto</button>
+                                        <button type="button" class="btn-cancel" onclick="cerrarModalProducto()">Cancelar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="tabla-productos" style="margin-top: 20px;">
+                            <table class="tabla-data">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Nombre</th>
+                                        <th>Categoría</th>
+                                        <th>Precio</th>
+                                        <th>Stock</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productos-lista">
+                                    <tr><td colspan="7" style="text-align: center;">Cargando productos...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección Inventario -->
+                <section id="inventario-section" class="section" style="display: none;">
+                    <div class="section-header-bar">
+                        <div>
+                            <span class="breadcrumb-nav">Inventario</span>
+                            <h1>Gestión de Inventario</h1>
+                        </div>
+                        <button class="btn-back" onclick="volverAtras()">← Volver</button>
+                    </div>
+                    <div class="section-content">
+                        <button class="btn-primary" onclick="abrirFormularioInventario()">+ Agregar Lote</button>
+                        
+                        <!-- Modal para agregar inventario -->
+                        <div id="modal-inventario" class="modal" style="display: none;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2>Agregar Lote al Inventario</h2>
+                                    <button class="btn-close" onclick="cerrarModalInventario()">×</button>
+                                </div>
+                                <form id="form-inventario" class="form-usuario">
+                                    <div class="form-group">
+                                        <label for="inventario-producto">Producto *</label>
+                                        <select id="inventario-producto" required>
+                                            <option value="">Seleccione un producto</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="inventario-stock">Cantidad de Stock *</label>
+                                        <input type="number" id="inventario-stock" placeholder="Cantidad" min="1" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="inventario-ingreso">Fecha de Ingreso *</label>
+                                        <input type="date" id="inventario-ingreso" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="inventario-vencimiento">Fecha de Vencimiento</label>
+                                        <input type="date" id="inventario-vencimiento">
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-primary">Agregar Lote</button>
+                                        <button type="button" class="btn-cancel" onclick="cerrarModalInventario()">Cancelar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="tabla-inventario" style="margin-top: 20px;">
+                            <table class="tabla-data">
+                                <thead>
+                                    <tr>
+                                        <th>Código Lote</th>
+                                        <th>Producto</th>
+                                        <th>Categoría</th>
+                                        <th>Stock</th>
+                                        <th>F. Ingreso</th>
+                                        <th>F. Vencimiento</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventario-lista">
+                                    <tr><td colspan="8" style="text-align: center;">Cargando inventario...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección Empleados -->
+                <section id="empleados-section" class="section" style="display: none;">
+                    <div class="section-header-bar">
+                        <div>
+                            <span class="breadcrumb-nav">Empleados</span>
+                            <h1>Gestión de Empleados</h1>
+                        </div>
+                        <button class="btn-back" onclick="volverAtras()">← Volver</button>
+                    </div>
+                    <div class="section-content">
+                        <button class="btn-primary" onclick="cambiarSeccion('usuarios')">+ Nuevo Empleado</button>
+                        
+                        <div class="tabla-empleados" style="margin-top: 20px;">
+                            <table class="tabla-data">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombres</th>
+                                        <th>Apellidos</th>
+                                        <th>Correo</th>
+                                        <th>Teléfono</th>
+                                        <th>Rol</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="empleados-lista">
+                                    <tr><td colspan="8" style="text-align: center;">Cargando empleados...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sección Usuarios -->
+                <section id="usuarios-section" class="section" style="display: none;">
+                    <div class="section-header-bar">
+                        <div>
+                            <span class="breadcrumb-nav">Usuarios > Registro de Usuario</span>
+                            <h1>Registro de Usuario</h1>
+                        </div>
+                        <button class="btn-back" onclick="volverAtras()">← Volver</button>
+                    </div>
+                    <div class="section-content">
+                        <form id="form-usuario" class="form-usuario">
+                            <div class="form-section">
+                                <h3>Información Personal</h3>
+                                <p class="form-subtitle">Complete los siguientes campos para registrar un nuevo usuario</p>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="nombre1">Primer Nombre *</label>
+                                        <input type="text" id="nombre1" placeholder="Ej. Juan" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="nombre2">Segundo Nombre</label>
+                                        <input type="text" id="nombre2" placeholder="Ej. Carlos">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="apellido1">Primer Apellido *</label>
+                                        <input type="text" id="apellido1" placeholder="Ej. Pérez" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="apellido2">Segundo Apellido</label>
+                                        <input type="text" id="apellido2" placeholder="Ej. García">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="fechanac">Fecha de Nacimiento *</label>
+                                        <input type="date" id="fechanac" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sexo">Sexo *</label>
+                                        <select id="sexo" required>
+                                            <option value="">Seleccione</option>
+                                            <option value="1">Masculino</option>
+                                            <option value="0">Femenino</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="correo">Correo Electrónico *</label>
+                                        <input type="email" id="correo" placeholder="correo@ejemplo.com" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="telefono">Teléfono *</label>
+                                        <input type="tel" id="telefono" placeholder="71234567" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3>Información de Acceso</h3>
+                                <p class="form-subtitle">Configura las credenciales de acceso</p>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="rol">Rol de Usuario *</label>
+                                        <select id="rol" required>
+                                            <option value="">Seleccione un rol</option>
+                                            <option value="1">Administrador</option>
+                                            <option value="2">Vendedor</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="contraseña">Contraseña *</label>
+                                        <input type="password" id="contraseña" placeholder="Mínimo 6 caracteres" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirmar-contraseña">Confirmar Contraseña *</label>
+                                        <input type="password" id="confirmar-contraseña" placeholder="Confirme la contraseña" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">Registrar Usuario</button>
+                                <button type="button" class="btn-cancel" onclick="limpiarFormulario()">Limpiar</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Sección Reports -->
+                <section id="reportes-section" class="section" style="display: none;">
+                    <div class="section-header-bar">
+                        <div>
+                            <span class="breadcrumb-nav">Reports</span>
+                            <h1>Reportes</h1>
+                        </div>
+                        <button class="btn-back" onclick="volverAtras()">← Volver</button>
+                    </div>
+                    <div class="section-content">
+                        <p>Función de reportes en desarrollo...</p>
+                    </div>
+                </section>
+
+                <!-- Sección Ajustes -->
+                <section id="ajustes-section" class="section" style="display: none;">
+                    <div class="section-header-bar">
+                        <div>
+                            <span class="breadcrumb-nav">Ajustes</span>
+                            <h1>Configuración del Sistema</h1>
+                        </div>
+                        <button class="btn-back" onclick="volverAtras()">← Volver</button>
+                    </div>
+                    <div class="section-content">
+                        <p>Función de ajustes en desarrollo...</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mensajes de alerta -->
+    <div id="alert" class="alert"></div>
+
+    <script src="services/auth.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

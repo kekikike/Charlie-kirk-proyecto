@@ -1,0 +1,30 @@
+{
+  "name": "charlie-kirk-proyecto",
+  "version": "1.0.0",
+  "description": "Un minimarket muy diverso, el proyecto se centrara en la proteccion de datos de transacciones y los datos de usuarios",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kekikike/Charlie-kirk-proyecto.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kekikike/Charlie-kirk-proyecto/issues"
+  },
+  "homepage": "https://github.com/kekikike/Charlie-kirk-proyecto#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.16.1"
+  }
+}
