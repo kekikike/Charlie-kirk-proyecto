@@ -1,13 +1,8 @@
-/**
- * Controlador de Productos
- */
 
 const servicios = require('../servicios/productos.js');
 const serviciosInventario = require('../servicios/inventario.js');
 
-/**
- * Obtener lista de categorías
- */
+
 const obtenerCategorias = (req, res) => {
     servicios.obtenerCategorias((err, categorias) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -31,21 +26,18 @@ const obtenerProductos = (req, res) => {
     });
 };
 
-/**
- * Crear nuevo producto
- */
+
 const crearProducto = (req, res) => {
     const { ciempleado } = req.usuario;
     const { nombre, idcategoria, preciounitario } = req.body;
 
-    // Validaciones
+    
     if (!nombre || !idcategoria || !preciounitario) {
         return res.status(400).json({ 
             mensaje: 'Por favor proporciona: nombre, idcategoria y preciounitario' 
         });
     }
 
-    // Obtener próximo código
     servicios.obtenerProximoCodigoProducto((err, codproducto) => {
         if (err) return res.status(500).json({ error: err.message });
 
@@ -68,9 +60,7 @@ const crearProducto = (req, res) => {
     });
 };
 
-/**
- * Actualizar producto
- */
+
 const actualizarProducto = (req, res) => {
     const { ciempleado } = req.usuario;
     const { codproducto } = req.params;
