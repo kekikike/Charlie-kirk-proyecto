@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const helmet = require('helmet');
 const app = express();
 const db = require('../config/conexion.js');
 const rutasAutenticacion = require('./autenticacion.js');
@@ -8,37 +9,40 @@ const rutasInventario = require('./inventario.js');
 const rutasVentas = require('./ventas.js');
 const rutasClientes = require('./clientes.js');
 const rutasRespaldo = require('./respaldo.js');
+const rutasAuditlogs = require('./auditlogs.js');
 const { verificarToken } = require('../middleware/autenticacion.js');
+const middlewareAudit = require('../middleware/auditoria.js');
 
-// Configurar CORS para permitir peticiones desde el frontend
+// Helmet: Protección contra ataques de headers
+app.use(helmet());
+
+// CORS mejorado
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('X-Content-Type-Options', 'nosniff');
+    res.header('X-Frame-Options', 'DENY');
+    res.header('X-XSS-Protection', '1; mode=block');
     if (req.method === 'OPTIONS') {
         return res.sendStatus(200);
     }
     next();
 });
 
-// Middleware de parsing
+// ==================== PARSING ====================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Servir archivos estáticos desde la carpeta frontend
 app.use(express.static(path.join(__dirname, '../../frontend')));
 
-// Rutas de autenticación
+// ==================== RUTAS ====================
 app.use('/api/auth', rutasAutenticacion);
-
-// Rutas de productos
 app.use('/api/productos', rutasProductos);
-
-// Rutas de inventario
 app.use('/api/inventario', rutasInventario);
-
-// Rutas de ventas
 app.use('/api/ventas', rutasVentas);
+app.use('/api/auditlogs', rutasAuditlogs);
 
 // Rutas de clientes
 app.use('/api/clientes', rutasClientes);
