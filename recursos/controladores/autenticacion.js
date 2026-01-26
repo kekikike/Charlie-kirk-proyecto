@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const servicios = require('../servicios/autenticacion.js');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'tu_clave_secreta_super_segura_cambiar_en_produccion';
-const JWT_EXPIRE = process.env.JWT_EXPIRE || '24h';
 
 /**
  * Registrar nuevo usuario (Solo administrador)

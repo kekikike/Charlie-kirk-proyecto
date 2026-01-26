@@ -10,8 +10,9 @@ router.post('/login', login);
 router.post('/registro', verificarToken, registrarUsuario);
 router.get('/perfil', verificarToken, obtenerPerfil);
 
-// Rutas de empleados (protegidas)
+// Rutas de empleados (protegidas - solo administradores)
 router.get('/empleados', verificarToken, obtenerEmpleados);
 router.put('/empleados/:id/estado', verificarToken, actualizarEstadoEmpleado);
 router.delete('/empleados/:id', verificarToken, eliminarEmpleado);
+
 module.exports = router;
