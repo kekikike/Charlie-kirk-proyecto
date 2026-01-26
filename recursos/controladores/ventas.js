@@ -9,7 +9,7 @@ const servicios = require('../servicios/ventas.js');
  */
 const crearVenta = (req, res) => {
     const { ciempleado } = req.usuario;
-    const { subtotal, total, idmetodo, detalles } = req.body;
+    const { subtotal, total, idmetodo, ci_nit, detalles } = req.body;
 
     // Validaciones
     if (!subtotal || !total || !idmetodo || !detalles || detalles.length === 0) {
@@ -23,6 +23,7 @@ const crearVenta = (req, res) => {
         subtotal: parseFloat(subtotal),
         total: parseFloat(total),
         idmetodo: parseInt(idmetodo),
+        ci_nit: ci_nit ? parseInt(ci_nit) : null,
         detalles: detalles.map(d => ({
             codproducto: d.codproducto,
             cantidad: parseInt(d.cantidad),

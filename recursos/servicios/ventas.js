@@ -10,14 +10,14 @@ const db = require('../config/conexion.js');
  * @param {Function} callback - Callback(err, resultado)
  */
 const crearVenta = (datos, callback) => {
-    const { ciempleado, subtotal, total, idmetodo, detalles } = datos;
+    const { ciempleado, subtotal, total, idmetodo, ci_nit, detalles } = datos;
     
     const queryVenta = `
-        INSERT INTO tventas (ciempleado, subtotal, total, idmetodo, fecharegistro, estado, usuarioA)
-        VALUES (?, ?, ?, ?, NOW(), 1, ?)
+        INSERT INTO tventas (ci_nit, ciempleado, subtotal, total, idmetodo, fechaventa, hora, fecharegistro, estado, usuarioA)
+        VALUES (?, ?, ?, ?, ?, CURDATE(), CURTIME(), NOW(), 1, ?)
     `;
     
-    db.query(queryVenta, [ciempleado, subtotal, total, idmetodo, ciempleado], (err, result) => {
+    db.query(queryVenta, [ci_nit || null, ciempleado, subtotal, total, idmetodo, ciempleado], (err, result) => {
         if (err) return callback(err, null);
         
         const idventa = result.insertId;
@@ -31,13 +31,13 @@ const crearVenta = (datos, callback) => {
         
         detalles.forEach((detalle) => {
             const queryDetalle = `
-                INSERT INTO tdetalleventa (idventa, codinventario, cantidad, total, estado, usuarioA)
-                VALUES (?, ?, ?, ?, 1, ?)
+                INSERT INTO tdetalleventa (idventa, codproducto, cantidad, preciounitario, subtotal, estado, usuarioA)
+                VALUES (?, ?, ?, ?, ?, 1, ?)
             `;
             
             db.query(
                 queryDetalle,
-                [idventa, detalle.codproducto, detalle.cantidad, detalle.subtotal, ciempleado],
+                [idventa, detalle.codproducto, detalle.cantidad, detalle.preciounitario, detalle.subtotal, ciempleado],
                 (err) => {
                     if (err) {
                         console.error('[DETALLE] Error insertando detalle:', err.message);

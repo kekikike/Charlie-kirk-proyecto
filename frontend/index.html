@@ -28,10 +28,10 @@
                     <li><a href="#" class="nav-item" data-section="historial">📜 Historial</a></li>
                     <li><a href="#" class="nav-item" data-section="productos">📦 Productos</a></li>
                     <li><a href="#" class="nav-item" data-section="inventario">📊 Inventario</a></li>
+                    <li><a href="#" class="nav-item" data-section="clientes">👥 Clientes</a></li>
                     <li id="nav-empleados" style="display: none;"><a href="#" class="nav-item" data-section="empleados">👔 Empleados</a></li>
                     <li id="nav-usuarios" style="display: none;"><a href="#" class="nav-item" data-section="usuarios">👥 Usuarios</a></li>
-                    <li><a href="#" class="nav-item" data-section="reportes">📈 Reports</a></li>
-                    <li id="nav-configuracion" style="display: none;"><a href="#" class="nav-item" data-section="ajustes">⚙️ Ajustes</a></li>
+                    <li id="nav-respaldo" style="display: none;"><a href="#" class="nav-item" data-section="respaldo">💾 Respaldo</a></li>
                 </ul>
             </nav>
         </aside>
@@ -108,8 +108,36 @@
                         <button class="btn-back" onclick="volverAtras()">← Volver</button>
                     </div>
                     <div class="section-content ventas-content">
-                        <!-- Búsqueda de productos -->
-                        <div class="busqueda-productos">
+                        <!-- Sección de Cliente (OBLIGATORIA) -->
+                        <div class="seccion-cliente-obligatoria">
+                            <h2>1. Datos del Cliente * (Obligatorio)</h2>
+                            <div class="cliente-busqueda">
+                                <div style="display: flex; gap: 8px;">
+                                    <input 
+                                        type="text" 
+                                        id="buscar-cliente-ci" 
+                                        placeholder="Ingrese C.I./NIT del cliente"
+                                        class="input-busqueda"
+                                        style="flex: 1;"
+                                    >
+                                    <button type="button" class="btn-primary" onclick="buscarClientePorCI()">Buscar</button>
+                                </div>
+                            </div>
+                            <div class="cliente-info" id="cliente-info-contenedor" style="margin-top: 12px; display: none;">
+                                <div style="background: #e8f5e9; padding: 12px; border-radius: 4px; border-left: 4px solid #4caf50;">
+                                    <p id="cliente-seleccionado" style="margin: 0; color: #2e7d32; font-weight: 500;">No hay cliente seleccionado</p>
+                                </div>
+                                <button type="button" class="btn-secondary" onclick="limpiarClienteVenta()" style="margin-top: 8px;">Cambiar Cliente</button>
+                            </div>
+                            <input type="hidden" id="cliente-seleccionado-id" value="">
+                        </div>
+
+                        <!-- Separador visual -->
+                        <hr style="margin: 20px 0; border: none; border-top: 2px solid #e0e0e0;">
+
+                        <!-- Búsqueda de productos (Solo habilitado si hay cliente) -->
+                        <div class="busqueda-productos" id="seccion-productos" style="opacity: 0.5; pointer-events: none;">
+                            <h2>2. Productos</h2>
                             <div class="search-box">
                                 <input 
                                     type="text" 
@@ -117,6 +145,7 @@
                                     placeholder="🔍 Escanear código de barras o escribir el nombre del producto..."
                                     class="input-busqueda"
                                     onkeyup="buscarProductos(this.value)"
+                                    disabled
                                 >
                             </div>
                             <div id="resultados-busqueda" class="resultados-busqueda" style="display: none;">
@@ -149,7 +178,7 @@
 
                             <!-- Resumen de venta -->
                             <div class="resumen-venta">
-                                <h2>Resumen de Venta</h2>
+                                <h2>3. Resumen de Venta</h2>
                                 
                                 <div class="resumen-item">
                                     <span>Subtotal:</span>
@@ -165,7 +194,7 @@
                                     <h3>Método de Pago</h3>
                                     <div class="metodos-pago">
                                         <button class="metodo-btn" data-metodo="1" onclick="seleccionarMetodoPago(1)">
-                                            <span class="metodo-icon">�</span>
+                                            <span class="metodo-icon">💵</span>
                                             <span class="metodo-nombre">Efectivo</span>
                                         </button>
                                         <button class="metodo-btn" data-metodo="2" onclick="seleccionarMetodoPago(2)">
@@ -180,7 +209,7 @@
                                     <input type="hidden" id="metodo-pago-seleccionado" value="">
                                 </div>
 
-                                <button class="btn-finalizar-venta" onclick="finalizarVenta()" id="btn-finalizar">
+                                <button class="btn-finalizar-venta" onclick="finalizarVenta()" id="btn-finalizar" disabled title="Primero debe seleccionar un cliente">
                                     ✓ Finalizar Venta
                                 </button>
                                 <button class="btn-cancel" onclick="cancelarVenta()">Cancelar</button>
@@ -357,6 +386,106 @@
                     </div>
                 </section>
 
+                <!-- Sección Clientes -->
+                <section id="clientes-section" class="section" style="display: none;">
+                    <div class="section-header-bar">
+                        <div>
+                            <span class="breadcrumb-nav">Clientes</span>
+                            <h1>Gestión de Clientes</h1>
+                        </div>
+                        <button class="btn-back" onclick="volverAtras()">← Volver</button>
+                    </div>
+                    <div class="section-content">
+                        <button class="btn-primary" onclick="abrirFormularioCliente()">+ Nuevo Cliente</button>
+                        
+                        <!-- Modal para crear/editar cliente -->
+                        <div id="modal-cliente" class="modal" style="display: none;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 id="modal-cliente-titulo">Nuevo Cliente</h2>
+                                    <button class="btn-close" onclick="cerrarModalCliente()">×</button>
+                                </div>
+                                <form id="form-cliente" class="form-usuario">
+                                    <!-- Modo: creación/edición desde sección clientes -->
+                                    <div id="cliente-form-normal" style="display: none;">
+                                        <div class="form-group">
+                                            <label for="cliente-ci">C.I./NIT *</label>
+                                            <input type="number" id="cliente-ci" placeholder="Ej. 12345678" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="cliente-nombre">Nombre *</label>
+                                            <input type="text" id="cliente-nombre" placeholder="Ej. Juan Pérez" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="cliente-apellido">Apellido *</label>
+                                            <input type="text" id="cliente-apellido" placeholder="Ej. García" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="cliente-correo">Correo Electrónico</label>
+                                            <input type="email" id="cliente-correo" placeholder="cliente@ejemplo.com">
+                                        </div>
+
+                                        <div class="form-actions">
+                                            <button type="submit" class="btn-primary">Guardar Cliente</button>
+                                            <button type="button" class="btn-cancel" onclick="cerrarModalCliente()">Cancelar</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modo: búsqueda y creación rápida desde venta -->
+                                    <div id="cliente-form-venta" style="display: none;">
+                                        <div class="form-group">
+                                            <label for="cliente-venta-ci">C.I./NIT *</label>
+                                            <input type="number" id="cliente-venta-ci" placeholder="Ej. 12345678" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="cliente-venta-nombre">Nombre *</label>
+                                            <input type="text" id="cliente-venta-nombre" placeholder="Ej. Juan Pérez" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="cliente-venta-apellido">Apellido *</label>
+                                            <input type="text" id="cliente-venta-apellido" placeholder="Ej. García" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="cliente-venta-correo">Correo Electrónico</label>
+                                            <input type="email" id="cliente-venta-correo" placeholder="cliente@ejemplo.com">
+                                        </div>
+
+                                        <div class="form-actions">
+                                            <button type="submit" class="btn-primary">Crear y Continuar</button>
+                                            <button type="button" class="btn-cancel" onclick="cerrarModalCliente()">Cancelar</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="tabla-clientes" style="margin-top: 20px;">
+                            <table class="tabla-data">
+                                <thead>
+                                    <tr>
+                                        <th>C.I./NIT</th>
+                                        <th>Nombre</th>
+                                        <th>Apellido</th>
+                                        <th>Correo</th>
+                                        <th>F. Registro</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientes-lista">
+                                    <tr><td colspan="7" style="text-align: center;">Cargando clientes...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Sección Empleados -->
                 <section id="empleados-section" class="section" style="display: none;">
                     <div class="section-header-bar">
@@ -490,31 +619,45 @@
                     </div>
                 </section>
 
-                <!-- Sección Reports -->
-                <section id="reportes-section" class="section" style="display: none;">
-                    <div class="section-header-bar">
-                        <div>
-                            <span class="breadcrumb-nav">Reports</span>
-                            <h1>Reportes</h1>
-                        </div>
-                        <button class="btn-back" onclick="volverAtras()">← Volver</button>
-                    </div>
-                    <div class="section-content">
-                        <p>Función de reportes en desarrollo...</p>
-                    </div>
-                </section>
-
                 <!-- Sección Ajustes -->
-                <section id="ajustes-section" class="section" style="display: none;">
+                <section id="respaldo-section" class="section" style="display: none;">
                     <div class="section-header-bar">
                         <div>
-                            <span class="breadcrumb-nav">Ajustes</span>
-                            <h1>Configuración del Sistema</h1>
+                            <span class="breadcrumb-nav">Respaldo</span>
+                            <h1>Copia de Seguridad de Base de Datos</h1>
                         </div>
                         <button class="btn-back" onclick="volverAtras()">← Volver</button>
                     </div>
                     <div class="section-content">
-                        <p>Función de ajustes en desarrollo...</p>
+                        <div style="max-width: 600px;">
+                            <div style="background: #fff3e0; padding: 16px; border-radius: 4px; border-left: 4px solid #ff9800; margin-bottom: 20px;">
+                                <p style="margin: 0; color: #e65100;">
+                                    <strong>⚠️ Información Importante:</strong><br>
+                                    Esta función crea una copia de seguridad completa de la base de datos actual.
+                                    El archivo será descargado automáticamente como un archivo .sql que puedes guardar de forma segura.
+                                </p>
+                            </div>
+
+                            <h3>Crear Respaldo</h3>
+                            <p style="color: #666;">Haz clic en el botón para descargar una copia completa de la base de datos.</p>
+                            
+                            <button class="btn-primary" onclick="crearRespaldo()" style="font-size: 16px; padding: 12px 24px; margin-bottom: 20px;">
+                                💾 Crear Copia de Seguridad
+                            </button>
+
+                            <div id="respaldo-info" style="display: none; background: #e8f5e9; padding: 16px; border-radius: 4px; margin-top: 20px;">
+                                <p style="margin: 0; color: #2e7d32;"><strong>✓ Respaldo creado exitosamente</strong></p>
+                                <p id="respaldo-fecha" style="margin: 8px 0 0 0; color: #558b2f; font-size: 14px;"></p>
+                            </div>
+
+                            <h3 style="margin-top: 40px;">Historial de Respaldos</h3>
+                            <p style="color: #666;">Los respaldos se descargan automáticamente a tu carpeta de descargas.</p>
+                            <ul style="color: #666; line-height: 1.8;">
+                                <li>📄 Nombre del archivo: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">kirkmark_backup_YYYYMMDD_HHMMSS.sql</code></li>
+                                <li>📦 Contiene: Estructura y datos completos de todas las tablas</li>
+                                <li>🔒 Seguridad: Guarda el archivo en un lugar seguro</li>
+                            </ul>
+                        </div>
                     </div>
                 </section>
             </div>
