@@ -6,6 +6,8 @@ const rutasAutenticacion = require('./autenticacion.js');
 const rutasProductos = require('./productos.js');
 const rutasInventario = require('./inventario.js');
 const rutasVentas = require('./ventas.js');
+const rutasClientes = require('./clientes.js');
+const rutasRespaldo = require('./respaldo.js');
 const { verificarToken } = require('../middleware/autenticacion.js');
 
 // Configurar CORS para permitir peticiones desde el frontend
@@ -37,6 +39,12 @@ app.use('/api/inventario', rutasInventario);
 
 // Rutas de ventas
 app.use('/api/ventas', rutasVentas);
+
+// Rutas de clientes
+app.use('/api/clientes', rutasClientes);
+
+// Rutas de respaldo
+app.use('/api/respaldo', rutasRespaldo);
 
 // Rutas públicas
 app.get('/empleados', (req, res) => {

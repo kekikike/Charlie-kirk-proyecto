@@ -69,16 +69,16 @@ function actualizarBreadcrumb(nombre) {
 function mostrarOpcionesAdmin(esAdmin) {
     const navEmpleados = document.getElementById('nav-empleados');
     const navUsuarios = document.getElementById('nav-usuarios');
-    const navConfiguracion = document.getElementById('nav-configuracion');
+    const navRespaldo = document.getElementById('nav-respaldo');
     
     if (esAdmin) {
         if (navEmpleados) navEmpleados.style.display = 'block';
         if (navUsuarios) navUsuarios.style.display = 'block';
-        if (navConfiguracion) navConfiguracion.style.display = 'block';
+        if (navRespaldo) navRespaldo.style.display = 'block';
     } else {
         if (navEmpleados) navEmpleados.style.display = 'none';
         if (navUsuarios) navUsuarios.style.display = 'none';
-        if (navConfiguracion) navConfiguracion.style.display = 'none';
+        if (navRespaldo) navRespaldo.style.display = 'none';
     }
 }
 
@@ -1268,9 +1268,33 @@ function calcularResumen() {
     document.getElementById('subtotal').textContent = `Bs. ${subtotal.toFixed(2)}`;
     document.getElementById('total').textContent = `Bs. ${total.toFixed(2)}`;
 
-    // Habilitar/deshabilitar botón de finalizar
+    // Actualizar estado del botón finalizar
+    actualizarEstadoBtnFinalizar();
+}
+
+/**
+ * Actualiza el estado del botón finalizar
+ */
+function actualizarEstadoBtnFinalizar() {
     const btnFinalizar = document.getElementById('btn-finalizar');
-    btnFinalizar.disabled = productosVenta.length === 0 || !metodoPagoSeleccionado;
+    const hayCliente = clienteSeleccionadoVenta !== null && document.getElementById('cliente-seleccionado-id').value !== '';
+    const hayProductos = productosVenta.length > 0;
+    const hayMetodoPago = metodoPagoSeleccionado !== null;
+
+    // El botón se habilita solo si hay cliente, productos y método de pago
+    if (hayCliente && hayProductos && hayMetodoPago) {
+        btnFinalizar.disabled = false;
+        btnFinalizar.title = 'Click para finalizar la venta';
+    } else {
+        btnFinalizar.disabled = true;
+        if (!hayCliente) {
+            btnFinalizar.title = 'Primero debe seleccionar un cliente';
+        } else if (!hayProductos) {
+            btnFinalizar.title = 'Debe agregar al menos un producto';
+        } else if (!hayMetodoPago) {
+            btnFinalizar.title = 'Debe seleccionar un método de pago';
+        }
+    }
 }
 
 /**
@@ -1288,15 +1312,17 @@ function seleccionarMetodoPago(idmetodo) {
     // Guardar en input hidden
     document.getElementById('metodo-pago-seleccionado').value = idmetodo;
 
-    // Habilitar botón de finalizar si hay productos
-    const btnFinalizar = document.getElementById('btn-finalizar');
-    btnFinalizar.disabled = productosVenta.length === 0 || !metodoPagoSeleccionado;
+    // Actualizar estado del botón finalizar
+    actualizarEstadoBtnFinalizar();
 }
 
-/**
- * Finaliza la venta guardándola en la base de datos
- */
 async function finalizarVenta() {
+    // Validar cliente (OBLIGATORIO)
+    if (!clienteSeleccionadoVenta || !document.getElementById('cliente-seleccionado-id').value) {
+        mostrarAlerta('❌ ERROR: Debe seleccionar un cliente antes de finalizar la venta', 'error');
+        return;
+    }
+
     if (productosVenta.length === 0) {
         mostrarAlerta('Debe agregar al menos un producto', 'error');
         return;
@@ -1314,6 +1340,7 @@ async function finalizarVenta() {
         subtotal: subtotal,
         total: total,
         idmetodo: metodoPagoSeleccionado,
+        ci_nit: clienteSeleccionadoVenta.ci_nit,
         detalles: productosVenta.map(prod => ({
             codproducto: prod.codproducto,
             cantidad: prod.cantidad,
@@ -1341,14 +1368,23 @@ async function finalizarVenta() {
         const data = await response.json();
         console.log('[FINALIZAR VENTA] Respuesta:', data);
 
-        mostrarAlerta(`Venta registrada exitosamente. ID: ${data.venta.idventa}`, 'success');
+        mostrarAlerta(`✓ Venta registrada exitosamente. ID: ${data.venta.idventa}`, 'success');
         
         // Limpiar venta
         productosVenta = [];
         metodoPagoSeleccionado = null;
+        clienteSeleccionadoVenta = null;
+        document.getElementById('buscar-cliente-ci').value = '';
+        document.getElementById('cliente-seleccionado-id').value = '';
+        document.getElementById('cliente-seleccionado').textContent = 'No hay cliente seleccionado';
+        document.querySelector('.cliente-busqueda').style.display = 'flex';
+        document.getElementById('cliente-info-contenedor').style.display = 'none';
         document.getElementById('buscar-producto').value = '';
         mostrarProductosVenta();
         calcularResumen();
+        
+        // Desabilitar sección de productos
+        desabilitarSeccionProductos();
 
         // Recargar historial
         setTimeout(() => {
@@ -1447,5 +1483,514 @@ window.cambiarSeccion = function(section) {
         document.getElementById('buscar-producto').value = '';
         mostrarProductosVenta();
         calcularResumen();
+    } else if (section === 'clientes') {
+        cargarClientes();
     }
 };
+
+/**
+ * ========================================
+ * MÓDULO DE CLIENTES
+ * ========================================
+ */
+
+let clienteSeleccionadoVenta = null;
+
+/**
+ * Busca un cliente por C.I. durante la venta
+ */
+async function buscarClientePorCI() {
+    const ci = document.getElementById('buscar-cliente-ci').value.trim();
+    
+    if (!ci) {
+        mostrarAlerta('Por favor ingrese un C.I./NIT', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/clientes/${ci}`, {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getToken()}`
+            }
+        });
+
+        if (response.ok) {
+            // Cliente encontrado
+            const data = await response.json();
+            clienteSeleccionadoVenta = data.cliente;
+            mostrarClienteSeleccionado(data.cliente);
+            mostrarAlerta('Cliente encontrado', 'success');
+            habilitarSeccionProductos();
+        } else {
+            // Cliente no encontrado, preguntar si crear uno nuevo
+            mostrarAlerta('Cliente no encontrado. Se abrirá el formulario para crear uno nuevo.', 'info');
+            abrirFormularioCrearClienteVenta(ci);
+        }
+    } catch (error) {
+        console.error('[CLIENTES] Error buscando cliente:', error);
+        mostrarAlerta('Error al buscar cliente', 'error');
+    }
+}
+
+/**
+ * Habilita la sección de productos
+ */
+function habilitarSeccionProductos() {
+    const seccionProductos = document.getElementById('seccion-productos');
+    seccionProductos.style.opacity = '1';
+    seccionProductos.style.pointerEvents = 'auto';
+    
+    const inputBuscar = document.getElementById('buscar-producto');
+    inputBuscar.disabled = false;
+}
+
+/**
+ * Desabilita la sección de productos
+ */
+function desabilitarSeccionProductos() {
+    const seccionProductos = document.getElementById('seccion-productos');
+    seccionProductos.style.opacity = '0.5';
+    seccionProductos.style.pointerEvents = 'none';
+    
+    const inputBuscar = document.getElementById('buscar-producto');
+    inputBuscar.disabled = true;
+}
+
+/**
+ * Muestra el cliente seleccionado en la venta
+ */
+function mostrarClienteSeleccionado(cliente) {
+    document.getElementById('cliente-seleccionado-id').value = cliente.ci_nit;
+    document.getElementById('cliente-seleccionado').textContent = 
+        `✓ ${cliente.nombre} ${cliente.apellido} (C.I.: ${cliente.ci_nit})`;
+    
+    const contenedor = document.getElementById('cliente-info-contenedor');
+    contenedor.style.display = 'block';
+    
+    // Ocultar input de búsqueda
+    document.querySelector('.cliente-busqueda').style.display = 'none';
+    
+    // Actualizar estado del botón finalizar
+    actualizarEstadoBtnFinalizar();
+}
+
+/**
+ * Limpia la selección de cliente en la venta
+ */
+function limpiarClienteVenta() {
+    clienteSeleccionadoVenta = null;
+    document.getElementById('cliente-seleccionado-id').value = '';
+    document.getElementById('buscar-cliente-ci').value = '';
+    document.querySelector('.cliente-busqueda').style.display = 'flex';
+    document.getElementById('cliente-info-contenedor').style.display = 'none';
+    document.getElementById('cliente-seleccionado').textContent = 'No hay cliente seleccionado';
+    
+    // Desabilitar sección de productos
+    desabilitarSeccionProductos();
+    
+    // Limpiar productos
+    productosVenta = [];
+    metodoPagoSeleccionado = null;
+    mostrarProductosVenta();
+    calcularResumen();
+    
+    // Actualizar estado del botón finalizar
+    actualizarEstadoBtnFinalizar();
+}
+
+/**
+ * Abre el formulario para crear un cliente en la venta
+ */
+function abrirFormularioCrearClienteVenta(ci = '') {
+    document.getElementById('modal-cliente').classList.add('active');
+    document.getElementById('modal-cliente').style.display = 'flex';
+    document.getElementById('modal-cliente-titulo').textContent = 'Registrar Nuevo Cliente';
+    
+    // Mostrar formulario de venta y ocultar normal
+    document.getElementById('cliente-form-normal').style.display = 'none';
+    document.getElementById('cliente-form-venta').style.display = 'block';
+    
+    // Pre-llenar C.I. si viene desde búsqueda
+    document.getElementById('cliente-venta-ci').value = ci;
+    document.getElementById('cliente-venta-nombre').value = '';
+    document.getElementById('cliente-venta-apellido').value = '';
+    document.getElementById('cliente-venta-correo').value = '';
+    
+    const form = document.getElementById('form-cliente');
+    form.onsubmit = null;
+    form.removeEventListener('submit', form.onsubmit);
+    form.addEventListener('submit', handleCrearClienteVenta);
+}
+
+/**
+ * Carga la lista de clientes
+ */
+async function cargarClientes() {
+    console.log('[CLIENTES] Cargando lista de clientes');
+    try {
+        const response = await fetch('http://localhost:3000/api/clientes', {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getToken()}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al cargar clientes');
+        }
+
+        const data = await response.json();
+        console.log('[CLIENTES] Datos recibidos:', data);
+        mostrarClientes(data.clientes || []);
+    } catch (error) {
+        console.error('[CLIENTES] Error:', error);
+        mostrarAlerta('Error al cargar clientes', 'error');
+    }
+}
+
+/**
+ * Muestra la lista de clientes en la tabla
+ * @param {Array} clientes - Lista de clientes
+ */
+function mostrarClientes(clientes) {
+    const tbody = document.getElementById('clientes-lista');
+    
+    if (!clientes || clientes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay clientes registrados</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = clientes.map(cliente => {
+        const fechaRegistro = new Date(cliente.fecharegistro).toLocaleDateString('es-ES');
+        const badgeEstado = cliente.estado === 1 ? 'badge-activo' : 'badge-inactivo';
+        const estadoTexto = cliente.estado === 1 ? 'Activo' : 'Inactivo';
+
+        return `
+            <tr>
+                <td>${cliente.ci_nit}</td>
+                <td>${cliente.nombre}</td>
+                <td>${cliente.apellido}</td>
+                <td>${cliente.correo || '-'}</td>
+                <td>${fechaRegistro}</td>
+                <td><span class="badge ${badgeEstado}">${estadoTexto}</span></td>
+                <td>
+                    <div class="acciones-tabla">
+                        <button class="btn-accion btn-editar" onclick="editarCliente(${cliente.ci_nit}, '${cliente.nombre}', '${cliente.apellido}', '${cliente.correo || ''}')">Editar</button>
+                        <button class="btn-accion btn-eliminar" onclick="eliminarCliente(${cliente.ci_nit})">Eliminar</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+/**
+ * Abre el formulario para crear un nuevo cliente desde la sección Clientes
+ */
+function abrirFormularioCliente() {
+    cambiarSeccion('clientes');
+    document.getElementById('modal-cliente').classList.add('active');
+    document.getElementById('modal-cliente').style.display = 'flex';
+    document.getElementById('modal-cliente-titulo').textContent = 'Nuevo Cliente';
+    
+    // Mostrar formulario normal y ocultar venta
+    document.getElementById('cliente-form-normal').style.display = 'block';
+    document.getElementById('cliente-form-venta').style.display = 'none';
+    
+    document.getElementById('cliente-ci').value = '';
+    document.getElementById('cliente-ci').disabled = false;
+    document.getElementById('cliente-nombre').value = '';
+    document.getElementById('cliente-apellido').value = '';
+    document.getElementById('cliente-correo').value = '';
+    
+    // Asegurar que el handler es el correcto para crear
+    const form = document.getElementById('form-cliente');
+    form.onsubmit = null;
+    form.removeEventListener('submit', form.onsubmit);
+    form.addEventListener('submit', handleCrearCliente);
+}
+
+/**
+ * Cierra el modal de cliente
+ */
+function cerrarModalCliente() {
+    document.getElementById('modal-cliente').classList.remove('active');
+    document.getElementById('modal-cliente').style.display = 'none';
+    
+    // Limpiar campos
+    document.getElementById('form-cliente').reset();
+}
+
+/**
+ * Maneja la creación de un cliente desde la sección Clientes
+ */
+async function handleCrearCliente(e) {
+    e.preventDefault();
+
+    const ci = document.getElementById('cliente-ci').value;
+    const nombre = document.getElementById('cliente-nombre').value;
+    const apellido = document.getElementById('cliente-apellido').value;
+    const correo = document.getElementById('cliente-correo').value;
+
+    if (!ci || !nombre || !apellido) {
+        mostrarAlerta('Por favor complete todos los campos requeridos', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/api/clientes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getToken()}`
+            },
+            body: JSON.stringify({
+                ci_nit: parseInt(ci),
+                nombre,
+                apellido,
+                correo: correo || null
+            })
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Error al crear cliente');
+        }
+
+        mostrarAlerta('Cliente registrado exitosamente', 'success');
+        cerrarModalCliente();
+        cargarClientes();
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarAlerta(error.message || 'Error al registrar cliente', 'error');
+    }
+}
+
+/**
+ * Maneja la creación de un cliente desde la venta
+ */
+async function handleCrearClienteVenta(e) {
+    e.preventDefault();
+
+    const ci = document.getElementById('cliente-venta-ci').value;
+    const nombre = document.getElementById('cliente-venta-nombre').value;
+    const apellido = document.getElementById('cliente-venta-apellido').value;
+    const correo = document.getElementById('cliente-venta-correo').value;
+
+    if (!ci || !nombre || !apellido) {
+        mostrarAlerta('Por favor complete todos los campos requeridos', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/api/clientes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getToken()}`
+            },
+            body: JSON.stringify({
+                ci_nit: parseInt(ci),
+                nombre,
+                apellido,
+                correo: correo || null
+            })
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Error al crear cliente');
+        }
+
+        const data = await response.json();
+        
+        // Seleccionar el cliente en la venta
+        clienteSeleccionadoVenta = data.cliente;
+        mostrarClienteSeleccionado(data.cliente);
+        habilitarSeccionProductos();
+
+        mostrarAlerta('Cliente registrado exitosamente', 'success');
+        cerrarModalCliente();
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarAlerta(error.message || 'Error al registrar cliente', 'error');
+    }
+}
+
+/**
+ * Edita un cliente
+ */
+function editarCliente(ci_nit, nombre, apellido, correo) {
+    document.getElementById('modal-cliente').classList.add('active');
+    document.getElementById('modal-cliente').style.display = 'flex';
+    document.getElementById('modal-cliente-titulo').textContent = 'Editar Cliente';
+    
+    // Mostrar formulario normal
+    document.getElementById('cliente-form-normal').style.display = 'block';
+    document.getElementById('cliente-form-venta').style.display = 'none';
+    
+    document.getElementById('cliente-ci').value = ci_nit;
+    document.getElementById('cliente-ci').disabled = true; // No permitir cambiar el C.I.
+    document.getElementById('cliente-nombre').value = nombre;
+    document.getElementById('cliente-apellido').value = apellido;
+    document.getElementById('cliente-correo').value = correo;
+    
+    // Crear un nuevo form submit handler para edición
+    const form = document.getElementById('form-cliente');
+    const handleEdicion = async (e) => {
+        e.preventDefault();
+        await handleActualizarCliente(ci_nit);
+        // Eliminar este handler después de usar
+        form.removeEventListener('submit', handleEdicion);
+        // Restaurar el handler original para crear
+        form.addEventListener('submit', handleCrearCliente);
+    };
+    
+    // Remover listeners anteriores
+    form.removeEventListener('submit', handleCrearCliente);
+    form.addEventListener('submit', handleEdicion);
+}
+
+/**
+ * Maneja la actualización de un cliente
+ */
+async function handleActualizarCliente(ci_nit) {
+    const nombre = document.getElementById('cliente-nombre').value;
+    const apellido = document.getElementById('cliente-apellido').value;
+    const correo = document.getElementById('cliente-correo').value;
+
+    if (!nombre || !apellido) {
+        mostrarAlerta('Por favor complete todos los campos', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/clientes/${ci_nit}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getToken()}`
+            },
+            body: JSON.stringify({
+                nombre,
+                apellido,
+                correo: correo || null
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al actualizar cliente');
+        }
+
+        mostrarAlerta('Cliente actualizado exitosamente', 'success');
+        
+        // Restaurar handler original
+        const form = document.getElementById('form-cliente');
+        form.onsubmit = null;
+        form.removeEventListener('submit', form.onsubmit);
+        form.addEventListener('submit', handleCrearCliente);
+        
+        // Re-habilitar C.I.
+        document.getElementById('cliente-ci').disabled = false;
+        
+        cerrarModalCliente();
+        cargarClientes();
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarAlerta('Error al actualizar cliente', 'error');
+    }
+}
+
+/**
+ * Elimina un cliente
+ */
+async function eliminarCliente(ci_nit) {
+    if (!confirm('¿Está seguro de que desea eliminar este cliente?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/clientes/${ci_nit}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getToken()}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al eliminar cliente');
+        }
+
+        mostrarAlerta('Cliente eliminado exitosamente', 'success');
+        cargarClientes();
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarAlerta('Error al eliminar cliente', 'error');
+    }
+}
+
+/**
+ * ========================================
+ * MÓDULO DE RESPALDO
+ * ========================================
+ */
+
+/**
+ * Crea una copia de seguridad de la base de datos
+ */
+async function crearRespaldo() {
+    const btnRespaldo = document.querySelector('[onclick="crearRespaldo()"]');
+    
+    // Mostrar estado de carga
+    const textoOriginal = btnRespaldo.textContent;
+    btnRespaldo.disabled = true;
+    btnRespaldo.textContent = '⏳ Creando copia de seguridad...';
+    
+    try {
+        const response = await fetch('http://localhost:3000/api/respaldo', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getToken()}`
+            }
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Error al crear respaldo');
+        }
+
+        // Descargar el archivo
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        // Nombre del archivo con fecha y hora
+        const ahora = new Date();
+        const fecha = ahora.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        a.download = `kirkmark-backup-${fecha}.sql`;
+        
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        // Mostrar mensaje de éxito
+        mostrarAlerta('✓ Copia de seguridad creada exitosamente', 'success');
+        
+        // Mostrar información del respaldo
+        const respaldoInfo = document.getElementById('respaldo-info');
+        const respaldoFecha = document.getElementById('respaldo-fecha');
+        
+        respaldoFecha.textContent = `Última copia de seguridad: ${ahora.toLocaleString('es-BO')}`;
+        respaldoInfo.style.display = 'block';
+
+    } catch (error) {
+        console.error('[RESPALDO] Error:', error);
+        mostrarAlerta(`Error al crear respaldo: ${error.message}`, 'error');
+    } finally {
+        // Restaurar botón
+        btnRespaldo.disabled = false;
+        btnRespaldo.textContent = textoOriginal;
+    }
+}
+
