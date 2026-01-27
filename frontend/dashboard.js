@@ -1606,11 +1606,15 @@ function abrirFormularioCrearClienteVenta(ci = '') {
     document.getElementById('modal-cliente').style.display = 'flex';
     document.getElementById('modal-cliente-titulo').textContent = 'Registrar Nuevo Cliente';
     
+    // Mostrar formulario de venta y ocultar normal
+    document.getElementById('cliente-form-normal').style.display = 'none';
+    document.getElementById('cliente-form-venta').style.display = 'block';
+    
     // Pre-llenar C.I. si viene desde búsqueda
-    document.getElementById('f-ci').value = ci;
-    document.getElementById('f-nombre').value = '';
-    document.getElementById('f-apellido').value = '';
-    document.getElementById('f-correo').value = '';
+    document.getElementById('cliente-venta-ci').value = ci;
+    document.getElementById('cliente-venta-nombre').value = '';
+    document.getElementById('cliente-venta-apellido').value = '';
+    document.getElementById('cliente-venta-correo').value = '';
     
     const form = document.getElementById('form-cliente');
     form.onsubmit = null;
@@ -1688,11 +1692,15 @@ function abrirFormularioCliente() {
     document.getElementById('modal-cliente').style.display = 'flex';
     document.getElementById('modal-cliente-titulo').textContent = 'Nuevo Cliente';
     
-    // Limpiar campos
-    document.getElementById('f-ci').value = '';
-    document.getElementById('f-nombre').value = '';
-    document.getElementById('f-apellido').value = '';
-    document.getElementById('f-correo').value = '';
+    // Mostrar formulario normal y ocultar venta
+    document.getElementById('cliente-form-normal').style.display = 'block';
+    document.getElementById('cliente-form-venta').style.display = 'none';
+    
+    document.getElementById('cliente-ci').value = '';
+    document.getElementById('cliente-ci').disabled = false;
+    document.getElementById('cliente-nombre').value = '';
+    document.getElementById('cliente-apellido').value = '';
+    document.getElementById('cliente-correo').value = '';
     
     // Asegurar que el handler es el correcto para crear
     const form = document.getElementById('form-cliente');
@@ -1718,10 +1726,10 @@ function cerrarModalCliente() {
 async function handleCrearCliente(e) {
     e.preventDefault();
 
-    const ci = document.getElementById('f-ci').value;
-    const nombre = document.getElementById('f-nombre').value;
-    const apellido = document.getElementById('f-apellido').value;
-    const correo = document.getElementById('f-correo').value;
+    const ci = document.getElementById('cliente-ci').value;
+    const nombre = document.getElementById('cliente-nombre').value;
+    const apellido = document.getElementById('cliente-apellido').value;
+    const correo = document.getElementById('cliente-correo').value;
 
     if (!ci || !nombre || !apellido) {
         mostrarAlerta('Por favor complete todos los campos requeridos', 'error');
@@ -1763,10 +1771,10 @@ async function handleCrearCliente(e) {
 async function handleCrearClienteVenta(e) {
     e.preventDefault();
 
-    const ci = document.getElementById('f-ci').value;
-    const nombre = document.getElementById('f-nombre').value;
-    const apellido = document.getElementById('f-apellido').value;
-    const correo = document.getElementById('f-correo').value;
+    const ci = document.getElementById('cliente-venta-ci').value;
+    const nombre = document.getElementById('cliente-venta-nombre').value;
+    const apellido = document.getElementById('cliente-venta-apellido').value;
+    const correo = document.getElementById('cliente-venta-correo').value;
 
     if (!ci || !nombre || !apellido) {
         mostrarAlerta('Por favor complete todos los campos requeridos', 'error');
@@ -1816,11 +1824,15 @@ function editarCliente(ci_nit, nombre, apellido, correo) {
     document.getElementById('modal-cliente').style.display = 'flex';
     document.getElementById('modal-cliente-titulo').textContent = 'Editar Cliente';
     
-    document.getElementById('f-ci').value = ci_nit;
-    document.getElementById('f-ci').disabled = true; // No permitir cambiar el C.I.
-    document.getElementById('f-nombre').value = nombre;
-    document.getElementById('f-apellido').value = apellido;
-    document.getElementById('f-correo').value = correo;
+    // Mostrar formulario normal
+    document.getElementById('cliente-form-normal').style.display = 'block';
+    document.getElementById('cliente-form-venta').style.display = 'none';
+    
+    document.getElementById('cliente-ci').value = ci_nit;
+    document.getElementById('cliente-ci').disabled = true; // No permitir cambiar el C.I.
+    document.getElementById('cliente-nombre').value = nombre;
+    document.getElementById('cliente-apellido').value = apellido;
+    document.getElementById('cliente-correo').value = correo;
     
     // Crear un nuevo form submit handler para edición
     const form = document.getElementById('form-cliente');
@@ -1842,9 +1854,9 @@ function editarCliente(ci_nit, nombre, apellido, correo) {
  * Maneja la actualización de un cliente
  */
 async function handleActualizarCliente(ci_nit) {
-    const nombre = document.getElementById('f-nombre').value;
-    const apellido = document.getElementById('f-apellido').value;
-    const correo = document.getElementById('f-correo').value;
+    const nombre = document.getElementById('cliente-nombre').value;
+    const apellido = document.getElementById('cliente-apellido').value;
+    const correo = document.getElementById('cliente-correo').value;
 
     if (!nombre || !apellido) {
         mostrarAlerta('Por favor complete todos los campos', 'error');
@@ -1878,7 +1890,7 @@ async function handleActualizarCliente(ci_nit) {
         form.addEventListener('submit', handleCrearCliente);
         
         // Re-habilitar C.I.
-        document.getElementById('f-ci').disabled = false;
+        document.getElementById('cliente-ci').disabled = false;
         
         cerrarModalCliente();
         cargarClientes();
