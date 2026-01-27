@@ -71,7 +71,7 @@
                         <div class="dashboard-card">
                             <div class="card-icon">📊</div>
                             <h3>Resumen de Ventas</h3>
-                            <p class="card-value">$0.00</p>
+                            <p class="card-value">Bs 0.00</p>
                             <p class="card-label">Hoy</p>
                         </div>
 
@@ -406,60 +406,29 @@
                                     <button class="btn-close" onclick="cerrarModalCliente()">×</button>
                                 </div>
                                 <form id="form-cliente" class="form-usuario">
-                                    <!-- Modo: creación/edición desde sección clientes -->
-                                    <div id="cliente-form-normal" style="display: none;">
-                                        <div class="form-group">
-                                            <label for="cliente-ci">C.I./NIT *</label>
-                                            <input type="number" id="cliente-ci" placeholder="Ej. 12345678" required>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="cliente-nombre">Nombre *</label>
-                                            <input type="text" id="cliente-nombre" placeholder="Ej. Juan Pérez" required>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="cliente-apellido">Apellido *</label>
-                                            <input type="text" id="cliente-apellido" placeholder="Ej. García" required>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="cliente-correo">Correo Electrónico</label>
-                                            <input type="email" id="cliente-correo" placeholder="cliente@ejemplo.com">
-                                        </div>
-
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-primary">Guardar Cliente</button>
-                                            <button type="button" class="btn-cancel" onclick="cerrarModalCliente()">Cancelar</button>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="f-ci">C.I./NIT *</label>
+                                        <input type="number" id="f-ci" placeholder="Ej. 12345678" required>
                                     </div>
 
-                                    <!-- Modo: búsqueda y creación rápida desde venta -->
-                                    <div id="cliente-form-venta" style="display: none;">
-                                        <div class="form-group">
-                                            <label for="cliente-venta-ci">C.I./NIT *</label>
-                                            <input type="number" id="cliente-venta-ci" placeholder="Ej. 12345678" required>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="f-nombre">Nombre *</label>
+                                        <input type="text" id="f-nombre" placeholder="Ej. Juan" required>
+                                    </div>
 
-                                        <div class="form-group">
-                                            <label for="cliente-venta-nombre">Nombre *</label>
-                                            <input type="text" id="cliente-venta-nombre" placeholder="Ej. Juan Pérez" required>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="f-apellido">Apellido *</label>
+                                        <input type="text" id="f-apellido" placeholder="Ej. García" required>
+                                    </div>
 
-                                        <div class="form-group">
-                                            <label for="cliente-venta-apellido">Apellido *</label>
-                                            <input type="text" id="cliente-venta-apellido" placeholder="Ej. García" required>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="f-correo">Correo Electrónico</label>
+                                        <input type="email" id="f-correo" placeholder="cliente@ejemplo.com">
+                                    </div>
 
-                                        <div class="form-group">
-                                            <label for="cliente-venta-correo">Correo Electrónico</label>
-                                            <input type="email" id="cliente-venta-correo" placeholder="cliente@ejemplo.com">
-                                        </div>
-
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-primary">Crear y Continuar</button>
-                                            <button type="button" class="btn-cancel" onclick="cerrarModalCliente()">Cancelar</button>
-                                        </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-primary">Guardar Cliente</button>
+                                        <button type="button" class="btn-cancel" onclick="cerrarModalCliente()">Cancelar</button>
                                     </div>
                                 </form>
                             </div>
