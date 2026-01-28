@@ -202,8 +202,8 @@
                                             <span class="metodo-nombre">Tarjeta Débito</span>
                                         </button>
                                         <button class="metodo-btn" data-metodo="3" onclick="seleccionarMetodoPago(3)">
-                                            <span class="metodo-icon">💳</span>
-                                            <span class="metodo-nombre">Tarjeta Crédito</span>
+                                            <span class="metodo-icon">📱</span>
+                                            <span class="metodo-nombre">QR</span>
                                         </button>
                                     </div>
                                     <input type="hidden" id="metodo-pago-seleccionado" value="">
@@ -217,7 +217,99 @@
                         </div>
                     </div>
                 </section>
+                <!-- Modal Pago con QR -->
+                <div id="modal-qr" class="modal" style="display: none; position: fixed; z-index: 9999; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
+                    <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%; text-align: center;">
+                        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                            <h2 style="margin: 0;">Pago con QR</h2>
+                            <button class="btn-close" onclick="cerrarModalQR()" style="cursor: pointer; border: none; background: none; font-size: 24px;">&times;</button>
+                        </div>
+                        
+                        <div class="modal-body" style="padding: 20px 0;">
+                            <div id="contenedor-qr">
+                                <p>Escanea el código con tu app bancaria</p>
+                                <img src="./src/assets/qr.jpg" alt="QR de prueba" style="width: 200px; margin: 15px 0;">
+                                <p style="color: #666; font-size: 0.9em;">Esperando confirmación del pago...</p>
+                            </div>
 
+                            <div id="mensaje-exito" style="display: none;">
+                                <div style="color: #4CAF50; font-size: 60px; margin-bottom: 10px;">✓</div>
+                                <h3 style="color: #4CAF50;">¡Se cobró exitosamente!</h3>
+                                <p>Ya puedes cerrar esta ventana.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" onclick="cerrarModalQR()" style="padding: 10px 20px; cursor: pointer;">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Modal Pago con Tarjeta -->
+                <div id="modal-tarjeta" class="modal" style="display: none;">
+                    <div class="modal-content" style="max-width: 1000px;">
+                        <div class="modal-header">
+                            <h2>MÉTODO DE PAGO</h2>
+                            <button class="btn-close" onclick="cerrarModalTarjeta()">×</button>
+                        </div>
+                        
+                        <form id="form-pago-completo" onsubmit="procesarValidacion(event)">
+                            <div class="form-group">
+                                <label>Selecciona un método de pago</label>
+                                <select id="tipo-tarjeta" required>
+                                    <option value="visa">Visa</option>
+                                    <option value="mastercard">Mastercard</option>
+                                </select>
+                            </div>
+
+                            <div style="display: flex; gap: 20px;">
+                                <div class="form-group" style="flex: 2;">
+                                    <label>Número de tarjeta</label>
+                                    <input type="text" id="num-tarjeta" placeholder="0000 0000 0000 0000" maxlength="16" required>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Fecha caducidad</label>
+                                    <div style="display: flex; gap: 5px;">
+                                        <input type="text" id="exp-mes" placeholder="MM" maxlength="2" required>
+                                        <input type="text" id="exp-anio" placeholder="AAAA" maxlength="4" required>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>CVV (?)</label>
+                                    <input type="password" id="cvv-tarjeta" maxlength="3" required>
+                                </div>
+                            </div>
+
+                            <h3>INFORMACIÓN DE FACTURACIÓN</h3>
+                            <div style="display: flex; gap: 10px;">
+                                <div class="form-group"><label>Nombre</label><input type="text" id="f-nombre" required></div>
+                                <div class="form-group"><label>Apellidos</label><input type="text" id="f-apellido" required></div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px;">
+                                <div class="form-group" style="flex: 2;"><label>Dirección</label><input type="text" required></div>
+                                <div class="form-group" style="flex: 1;"><label>Localidad</label><input type="text" value="La Paz"></div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px;">
+                                <div class="form-group"><label>Teléfono</label><input type="tel" id="f-tel" placeholder="77751832" required></div>
+                                <div class="form-group"><label>Código Postal</label><input type="text" id="f-cp" placeholder="0000"></div>
+                            </div>
+
+                            <div id="error-mensaje" style="color: #ff4d4d; margin-bottom: 10px; display: none; font-weight: bold;"></div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary" id="btn-procesar">Validar y Pagar</button>
+                            </div>
+                        </form>
+
+                        <div id="exito-pago" style="display: none; text-align: center; padding: 40px;">
+                            <div style="font-size: 60px;">💳 ✅</div>
+                            <h2>¡Tarjeta Validada!</h2>
+                            <p>La transacción ha sido aprobada</p>
+                        </div>
+                    </div>
+                </div>
                 <!-- Sección Historial -->
                 <section id="historial-section" class="section" style="display: none;">
                     <div class="section-header-bar">
@@ -234,6 +326,7 @@
                                     <tr>
                                         <th>ID Venta</th>
                                         <th>Fecha</th>
+                                        <th>Cliente</th>
                                         <th>Vendedor</th>
                                         <th>Productos</th>
                                         <th>Total</th>

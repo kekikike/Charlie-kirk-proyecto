@@ -57,27 +57,32 @@ const crearVenta = (datos, callback) => {
 };
 
 /**
- * Obtiene lista de ventas
+ * Obtiene lista de ventas incluyendo datos del cliente
  * @param {Function} callback - Callback(err, ventas)
  */
 const obtenerVentas = (callback) => {
+    // Hemos limpiado el query para evitar el error de la consola
     const query = `
         SELECT 
             tv.idventa, tv.ciempleado, tv.subtotal, tv.total,
             tv.idmetodo, tm.nombre as metodo, tv.fecharegistro, tv.estado,
             te.nombre1, te.apellido1,
-            COUNT(DISTINCT tdv.iddetalle) as cantidad_productos
+            tc.nombre as cliente_nom, tc.apellido as cliente_ape,
+            COUNT(tdv.iddetalle) as cantidad_productos
         FROM tventas tv
         LEFT JOIN tmetodopago tm ON tv.idmetodo = tm.idmetodo
         LEFT JOIN templeados te ON tv.ciempleado = te.ciempleado
         LEFT JOIN tdetalleventa tdv ON tv.idventa = tdv.idventa
-        GROUP BY tv.idventa, tv.ciempleado, tv.subtotal, tv.total, 
-                 tv.idmetodo, tm.nombre, tv.fecharegistro, tv.estado, te.nombre1, te.apellido1
+        LEFT JOIN tclientes tc ON tv.ci_nit = tc.ci_nit
+        GROUP BY tv.idventa
         ORDER BY tv.fecharegistro DESC
     `;
     
     db.query(query, (err, results) => {
-        if (err) return callback(err, null);
+        if (err) {
+            console.error("ERROR SQL:", err); // Esto te dirá el error exacto en la terminal
+            return callback(err, null);
+        }
         callback(null, results || []);
     });
 };
