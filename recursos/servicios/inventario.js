@@ -40,7 +40,7 @@ const obtenerInventarioPorProducto = (codproducto, callback) => {
             tp.nombre as producto, tp.preciounitario
         FROM tinventario ti
         LEFT JOIN tproductos tp ON ti.codproducto = tp.codproducto
-        WHERE ti.codproducto = ?
+        WHERE ti.codproducto = ? and ti.stock > 0
         ORDER BY ti.fechavencimiento ASC
     `;
     

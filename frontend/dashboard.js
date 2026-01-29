@@ -946,7 +946,7 @@ function mostrarInventario(lotes) {
 
     tbody.innerHTML = lotes.map(lote => {
         const badgeEstado = lote.estado === 1 ? 'badge-activo' : 'badge-inactivo';
-        const estadoTexto = lote.estado === 1 ? 'Activo' : 'Inactivo';
+        const estadoTexto = lote.estado === 1 ? 'Inactivo' : 'Activo';
         const fechaVencimiento = lote.fechavencimiento ? new Date(lote.fechavencimiento).toLocaleDateString('es-ES') : 'S/F';
         const fechaIngreso = new Date(lote.fechaingreso).toLocaleDateString('es-ES');
 
