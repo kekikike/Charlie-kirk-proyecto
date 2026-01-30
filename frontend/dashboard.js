@@ -946,7 +946,7 @@ function mostrarInventario(lotes) {
 
     tbody.innerHTML = lotes.map(lote => {
         const badgeEstado = lote.estado === 1 ? 'badge-activo' : 'badge-inactivo';
-        const estadoTexto = lote.estado === 1 ? 'Activo' : 'Inactivo';
+        const estadoTexto = lote.estado === 1 ? 'Inactivo' : 'Activo';
         const fechaVencimiento = lote.fechavencimiento ? new Date(lote.fechavencimiento).toLocaleDateString('es-ES') : 'S/F';
         const fechaIngreso = new Date(lote.fechaingreso).toLocaleDateString('es-ES');
 
@@ -1314,7 +1314,131 @@ function seleccionarMetodoPago(idmetodo) {
 
     // Actualizar estado del botón finalizar
     actualizarEstadoBtnFinalizar();
+
+    if (idmetodo === 3){
+        abrirModalQR();
+    }
+    if (idmetodo === 2) {
+        abrirModalTarjeta();
+    }
 }
+
+function abrirModalQR() {
+
+    const modal = document.getElementById('modal-qr');
+    const contenedorQR = document.getElementById('contenedor-qr');
+    const mensajeExito = document.getElementById('mensaje-exito');
+
+    modal.style.display = 'flex';
+    contenedorQR.style.display = 'block';
+    mensajeExito.style.display = 'none';
+
+    setTimeout(() => {
+        if (modal.style.display !== 'none') {
+            contenedorQR.style.display = 'none';
+            mensajeExito.style.display = 'block';
+        }
+    }, 5000); //5 seg de espera pago GG
+}
+function cerrarModalQR(){
+    document.getElementById('modal-qr').style.display = 'none';
+}
+
+
+// --- FUNCIÓN PARA MOSTRAR EL FORMULARIO ---
+function abrirModalTarjeta() {
+    const modal = document.getElementById('modal-tarjeta');
+    modal.style.display = 'flex';
+    
+    // Reseteamos el formulario por si lo cerraron antes
+    document.getElementById('form-pago-completo').reset(); 
+    document.getElementById('form-pago-completo').style.display = 'block';
+    document.getElementById('exito-pago').style.display = 'none';
+    document.getElementById('error-mensaje').style.display = 'none';
+}
+// 1. EL ALGORITMO DE LUHN (Validación real de números de tarjeta) MODAL TARJETAAAAAAA
+function validarLuhn(numero) {
+    let suma = 0;
+    let alternar = false;
+    for (let i = numero.length - 1; i >= 0; i--) {
+        let n = parseInt(numero[i], 10);
+        if (alternar) {
+            n *= 2;
+            if (n > 9) n -= 9;
+        }
+        suma += n;
+        alternar = !alternar;
+    }
+    return (suma % 10 === 0);
+}
+
+function procesarValidacion(event) {
+    event.preventDefault();
+    const errorDiv = document.getElementById('error-mensaje');
+    errorDiv.style.display = 'none';
+
+    // Obtener valores
+    const tarjeta = document.getElementById('num-tarjeta').value.replace(/\s+/g, '');
+    const telefono = document.getElementById('f-tel').value;
+    const mes = parseInt(document.getElementById('exp-mes').value);
+
+    // --- VALIDACIONES ---
+    
+    // Validar Tarjeta (Luhn)
+    if (!validarLuhn(tarjeta) || tarjeta.length < 15) {
+        mostrarError("Número de tarjeta inválido (Error de suma de verificación).");
+        return;
+    }
+
+    // Validar Mes
+    if (mes < 1 || mes > 12) {
+        mostrarError("El mes de caducidad debe ser entre 01 y 12.");
+        return;
+    }
+
+    // Validar Teléfono (Mínimo 8 dígitos)
+    if (!/^\d{8,15}$/.test(telefono)) {
+        mostrarError("El teléfono debe tener entre 8 y 15 números.");
+        return;
+    }
+
+    // --- SI TODO ESTÁ BIEN, SIMULAR PROCESAMIENTO ---
+    const btn = document.getElementById('btn-procesar');
+    btn.innerText = "Verificando con el banco...";
+    btn.disabled = true;
+
+    setTimeout(() => {
+        document.getElementById('form-pago-completo').style.display = 'none';
+        document.getElementById('exito-pago').style.display = 'block';
+
+        setTimeout(() => {
+            cerrarModalTarjeta();
+        }, 3000);
+    }, 2500);
+}
+
+function mostrarError(txt) {
+    const errorDiv = document.getElementById('error-mensaje');
+    errorDiv.innerText = "❌ " + txt;
+    errorDiv.style.display = 'block';
+}
+
+function cerrarModalTarjeta() {
+    // 1. Ocultar el modal
+    document.getElementById('modal-tarjeta').style.display = 'none';
+
+    // 2. BUSCAMOS EL BOTÓN Y LO RESETEAMOS
+    const btn = document.getElementById('btn-procesar');
+    if (btn) {
+        btn.disabled = false;           // Volver a hacerlo clickable
+        btn.innerText = "Validar y Pagar"; // Regresar el texto original
+    }
+    
+    // 3. Limpiar el formulario para la siguiente venta
+    document.getElementById('form-pago-completo').reset();
+}
+
+
 
 async function finalizarVenta() {
     // Validar cliente (OBLIGATORIO)
@@ -1451,14 +1575,18 @@ function mostrarHistorialVentas(ventas) {
         return;
     }
 
+    // Busca esta parte en tu archivo de historial
     tbody.innerHTML = ventas.map(venta => {
         const fecha = new Date(venta.fecharegistro).toLocaleString('es-BO');
-        const metodoClass = venta.idmetodo === 1 ? 'efectivo' : venta.idmetodo === 2 ? 'tarjeta' : 'tarjeta';
+        const metodoClass = venta.idmetodo === 1 ? 'efectivo' : 'tarjeta';
         
         return `
             <tr>
                 <td>${venta.idventa}</td>
                 <td>${fecha}</td>
+                
+                <td>${venta.cliente_nom || 'Sin nombre'} ${venta.cliente_ape || ''}</td>
+                
                 <td>${venta.nombre1} ${venta.apellido1 || ''}</td>
                 <td>${venta.cantidad_productos} producto(s)</td>
                 <td><strong>Bs. ${parseFloat(venta.total).toFixed(2)}</strong></td>
@@ -1607,10 +1735,10 @@ function abrirFormularioCrearClienteVenta(ci = '') {
     document.getElementById('modal-cliente-titulo').textContent = 'Registrar Nuevo Cliente';
     
     // Pre-llenar C.I. si viene desde búsqueda
-    document.getElementById('f-ci').value = ci;
-    document.getElementById('f-nombre').value = '';
-    document.getElementById('f-apellido').value = '';
-    document.getElementById('f-correo').value = '';
+    document.getElementById('cli-ci').value = ci;
+    document.getElementById('cli-nombre').value = '';
+    document.getElementById('cli-apellido').value = '';
+    document.getElementById('cli-correo').value = '';
     
     const form = document.getElementById('form-cliente');
     form.onsubmit = null;
@@ -1689,10 +1817,10 @@ function abrirFormularioCliente() {
     document.getElementById('modal-cliente-titulo').textContent = 'Nuevo Cliente';
     
     // Limpiar campos
-    document.getElementById('f-ci').value = '';
-    document.getElementById('f-nombre').value = '';
-    document.getElementById('f-apellido').value = '';
-    document.getElementById('f-correo').value = '';
+    document.getElementById('cli-ci').value = '';
+    document.getElementById('cli-nombre').value = '';
+    document.getElementById('cli-apellido').value = '';
+    document.getElementById('cli-correo').value = '';
     
     // Asegurar que el handler es el correcto para crear
     const form = document.getElementById('form-cliente');
@@ -1718,10 +1846,10 @@ function cerrarModalCliente() {
 async function handleCrearCliente(e) {
     e.preventDefault();
 
-    const ci = document.getElementById('f-ci').value;
-    const nombre = document.getElementById('f-nombre').value;
-    const apellido = document.getElementById('f-apellido').value;
-    const correo = document.getElementById('f-correo').value;
+    const ci = document.getElementById('cli-ci').value;
+    const nombre = document.getElementById('cli-nombre').value;
+    const apellido = document.getElementById('cli-apellido').value;
+    const correo = document.getElementById('cli-correo').value;
 
     if (!ci || !nombre || !apellido) {
         mostrarAlerta('Por favor complete todos los campos requeridos', 'error');
@@ -1763,10 +1891,10 @@ async function handleCrearCliente(e) {
 async function handleCrearClienteVenta(e) {
     e.preventDefault();
 
-    const ci = document.getElementById('f-ci').value;
-    const nombre = document.getElementById('f-nombre').value;
-    const apellido = document.getElementById('f-apellido').value;
-    const correo = document.getElementById('f-correo').value;
+    const ci = document.getElementById('cli-ci').value;
+    const nombre = document.getElementById('cli-nombre').value;
+    const apellido = document.getElementById('cli-apellido').value;
+    const correo = document.getElementById('cli-correo').value;
 
     if (!ci || !nombre || !apellido) {
         mostrarAlerta('Por favor complete todos los campos requeridos', 'error');
@@ -1816,11 +1944,11 @@ function editarCliente(ci_nit, nombre, apellido, correo) {
     document.getElementById('modal-cliente').style.display = 'flex';
     document.getElementById('modal-cliente-titulo').textContent = 'Editar Cliente';
     
-    document.getElementById('f-ci').value = ci_nit;
-    document.getElementById('f-ci').disabled = true; // No permitir cambiar el C.I.
-    document.getElementById('f-nombre').value = nombre;
-    document.getElementById('f-apellido').value = apellido;
-    document.getElementById('f-correo').value = correo;
+    document.getElementById('cli-ci').value = ci_nit;
+    document.getElementById('cli-ci').disabled = true; // No permitir cambiar el C.I.
+    document.getElementById('cli-nombre').value = nombre;
+    document.getElementById('cli-apellido').value = apellido;
+    document.getElementById('cli-correo').value = correo;
     
     // Crear un nuevo form submit handler para edición
     const form = document.getElementById('form-cliente');
@@ -1878,7 +2006,7 @@ async function handleActualizarCliente(ci_nit) {
         form.addEventListener('submit', handleCrearCliente);
         
         // Re-habilitar C.I.
-        document.getElementById('f-ci').disabled = false;
+        document.getElementById('cli-ci').disabled = false;
         
         cerrarModalCliente();
         cargarClientes();
