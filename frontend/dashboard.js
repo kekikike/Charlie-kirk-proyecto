@@ -1490,6 +1490,51 @@ async function finalizarVenta() {
         }
 
         const data = await response.json();
+        // --- BLOQUE GENERACIÓN DE PDF ---
+        // --- BLOQUE GENERACIÓN DE PDF ---
+        try {
+            const resTicket = await fetch('http://localhost:3000/api/ventas/ticket', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${AuthService.getToken()}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    idventa: data.venta.idventa,
+                    subtotal: subtotal,
+                    total: total,
+                    idmetodo: metodoPagoSeleccionado,
+                    // Enviamos el objeto cliente estructurado
+                    cliente: {
+                        ci_nit: clienteSeleccionadoVenta.ci_nit,
+                        nombre: clienteSeleccionadoVenta.nombre,
+                        apellido: clienteSeleccionadoVenta.apellido
+                    },
+                    // Enviamos los productos con su nombre y cantidad
+                    productos: productosVenta.map(p => ({
+                        cantidad: p.cantidad,
+                        nombre: p.nombre, 
+                        subtotal: p.subtotal
+                    }))
+                    // NOTA: No enviamos empleadoNombre aquí, el Backend lo pondrá solo
+                    
+
+                })
+            });
+
+            if (resTicket.ok) {
+                const blob = await resTicket.blob();
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank');
+            }
+        } catch (pdfError) {
+            console.error('Error al generar PDF:', pdfError);
+        }
+        // --- FIN BLOQUE PDF ---
+        //const datosVenta = req.body; 
+        
+        // El usuarioA lo sacamos del token (lo que tu amigo está arreglando)
+        //datosVenta.usuarioA = req.usuario.nombre || 'Empleado';
         console.log('[FINALIZAR VENTA] Respuesta:', data);
 
         mostrarAlerta(`✓ Venta registrada exitosamente. ID: ${data.venta.idventa}`, 'success');

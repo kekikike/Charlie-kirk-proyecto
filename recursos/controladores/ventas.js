@@ -2,6 +2,9 @@
  * Controlador de Ventas
  */
 
+// Al principio del archivo, importa el servicio de PDF que creaste
+const pdfServicio = require('../servicios/pdfServicio.js');
+const db = require('../config/conexion.js');
 const servicios = require('../servicios/ventas.js');
 
 /**
@@ -92,9 +95,40 @@ const obtenerMetodosPago = (req, res) => {
     });
 };
 
+
+const generarTicket = (req, res) => {
+    const datosVenta = req.body;
+    const ciEmpleado = req.usuario.ciempleado;
+    const idMetodo = datosVenta.idmetodo; // Viene del frontend
+
+    // 1. Buscamos el nombre del empleado
+    db.query('SELECT nombre1, apellido1 FROM templeados WHERE ciempleado = ?', [ciEmpleado], (err, rowsEmp) => {
+        if (err) {
+            datosVenta.empleadoNombre = "Vendedor";
+        } else {
+            const emp = rowsEmp[0];
+            datosVenta.empleadoNombre = emp ? `${emp.nombre1} ${emp.apellido1 || ''}`.trim() : "Vendedor";
+        }
+
+        // 2. Buscamos el nombre del método de pago
+        db.query('SELECT nombre FROM tmetodopago WHERE idmetodo = ?', [idMetodo], (err, rowsMet) => {
+            if (err || rowsMet.length === 0) {
+                datosVenta.metodoNombre = "No especificado";
+            } else {
+                datosVenta.metodoNombre = rowsMet[0].nombre;
+            }
+
+            // 3. Ya con todo, generamos el PDF
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', 'inline; filename=ticket.pdf');
+            pdfServicio.generarTicketPDF(datosVenta, res);
+        });
+    });
+};
 module.exports = {
     crearVenta,
     obtenerVentas,
     obtenerDetallesVenta,
-    obtenerMetodosPago
+    obtenerMetodosPago,
+    generarTicket // <--- Nueva
 };
