@@ -2,7 +2,7 @@
  * dashboard.js - Maneja la lógica del dashboard principal
  * Gestiona navegación entre secciones, carga de datos y protección de autenticación
  */
-const TIEMPO_MAX_INACTIVIDAD = 0.10 * 60 * 1000; // 10 minutos
+const TIEMPO_MAX_INACTIVIDAD = 10 * 60 * 1000; // 10 minutos
 let temporizadorInactividad;
 
 // Verificar autenticación al cargar la página
@@ -2278,3 +2278,32 @@ function reiniciarTemporizador() {
 document.addEventListener('DOMContentLoaded', () => {
     reiniciarTemporizador();
 });
+
+
+function respaldoAutomatico() {
+    const ahora = new Date();
+    const dia = ahora.getDay(); // 5 = viernes
+    const hora = ahora.getHours();
+    const minuto = ahora.getMinutes();
+
+    // Solo viernes a las 00:00 exacto
+    if (dia === 5 && hora === 0 && minuto === 0) {
+        if (!window.respaldoGeneradoHoy) {
+            window.respaldoGeneradoHoy = true;
+
+            // Llamar al endpoint AUTOMÁTICO que NO descarga
+            fetch('http://localhost:3000/api/respaldo/automatico', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${AuthService.getToken()}` }
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) console.log('[RESPALDO AUTOMÁTICO] Backup guardado en servidor');
+            })
+            .catch(err => console.error('[RESPALDO AUTOMÁTICO] Error:', err));
+        }
+    }
+}
+
+respaldoAutomatico();
+setInterval(respaldoAutomatico, 60 * 1000);
