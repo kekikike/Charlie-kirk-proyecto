@@ -9,7 +9,7 @@ const servicios = require('../servicios/clientes.js');
  */
 const crearCliente = (req, res) => {
     const { ciempleado } = req.usuario;
-    const { ci_nit, nombre, apellido, correo } = req.body;
+    const { ci_nit, nombre, apellido, correo, telefono } = req.body;
 
     // Validaciones
     if (!ci_nit || !nombre || !apellido) {
@@ -23,6 +23,7 @@ const crearCliente = (req, res) => {
         nombre,
         apellido,
         correo: correo || null,
+        telefono: telefono || null,  // NUEVO - Campo opcional
         usuarioA: ciempleado
     };
 

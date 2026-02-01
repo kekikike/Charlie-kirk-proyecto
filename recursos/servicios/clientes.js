@@ -3,6 +3,7 @@
  */
 
 const db = require('../config/conexion.js');
+const { encriptarDato, desencriptarDato, ocultarDato } = require('./encriptacion.js');
 
 /**
  * Crea un nuevo cliente
@@ -10,25 +11,30 @@ const db = require('../config/conexion.js');
  * @param {Function} callback - Callback(err, resultado)
  */
 const crearCliente = (datos, callback) => {
-    const { ci_nit, nombre, apellido, correo, usuarioA } = datos;
+    const { ci_nit, nombre, apellido, correo, telefono, usuarioA } = datos;
     
+    // Encriptar datos sensibles
+    const telefono_enc = telefono ? encriptarDato(telefono) : null;
+    
+    // IMPORTANTE: NO guardamos el teléfono sin encriptar, SOLO el encriptado
     const query = `
-        INSERT INTO tclientes (ci_nit, nombre, apellido, correo, estado, usuarioA)
-        VALUES (?, ?, ?, ?, 1, ?)
+        INSERT INTO tclientes (ci_nit, nombre, apellido, correo, telefono_enc, estado, usuarioA)
+        VALUES (?, ?, ?, ?, ?, 1, ?)
     `;
     
-    db.query(query, [ci_nit, nombre, apellido, correo, usuarioA], (err, result) => {
+    db.query(query, [ci_nit, nombre, apellido, correo, telefono_enc, usuarioA], (err, result) => {
         if (err) {
             console.error('[CLIENTES] Error al insertar:', err.message);
             return callback(err, null);
         }
         
-        // Retornar los datos del cliente creado
+        // Retornar los datos del cliente creado (sin mostrar encriptados)
         const clienteCreado = {
             ci_nit,
             nombre,
             apellido,
             correo,
+            telefono: telefono || null,
             estado: 1
         };
         
@@ -47,6 +53,7 @@ const obtenerClientes = (callback) => {
             nombre,
             apellido,
             correo,
+            telefono_enc,
             fecharegistro,
             estado
         FROM tclientes
@@ -60,7 +67,13 @@ const obtenerClientes = (callback) => {
             return callback(err, null);
         }
         
-        callback(null, clientes || []);
+        // Desencriptar datos sensibles
+        const clientesDesencriptados = clientes.map(cliente => ({
+            ...cliente,
+            telefono: cliente.telefono_enc ? desencriptarDato(cliente.telefono_enc) : null
+        }));
+        
+        callback(null, clientesDesencriptados || []);
     });
 };
 
@@ -76,6 +89,7 @@ const obtenerClientePorId = (ci_nit, callback) => {
             nombre,
             apellido,
             correo,
+            telefono_enc,
             fecharegistro,
             estado
         FROM tclientes
@@ -88,7 +102,18 @@ const obtenerClientePorId = (ci_nit, callback) => {
             return callback(err, null);
         }
         
-        callback(null, results.length > 0 ? results[0] : null);
+        if (results.length === 0) {
+            return callback(null, null);
+        }
+        
+        const cliente = results[0];
+        // Desencriptar datos sensibles
+        const clienteDesencriptado = {
+            ...cliente,
+            telefono: cliente.telefono_enc ? desencriptarDato(cliente.telefono_enc) : null
+        };
+        
+        callback(null, clienteDesencriptado);
     });
 };
 

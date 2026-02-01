@@ -16,17 +16,26 @@ document.addEventListener('DOMContentLoaded', function() {
  * Si no, redirige al login
  */
 async function verificarAutenticacion() {
+    Logger.agregar('DASHBOARD', 'Verificando autenticación...', 'info');
+    
     if (!AuthService.estaAutenticado()) {
+        Logger.agregar('DASHBOARD', 'No hay token, redirigiendo a login', 'warn');
         window.location.href = 'login.html';
         return;
     }
+    
+    Logger.agregar('DASHBOARD', 'Token encontrado, obteniendo perfil...', 'info');
     
     try {
         // Obtener datos del usuario
         const resultado = await AuthService.obtenerPerfil();
         
+        Logger.agregar('DASHBOARD', `Resultado de perfil: ${JSON.stringify(resultado)}`, 'info');
+        
         if (resultado.success) {
             const usuario = resultado.data;
+            
+            Logger.agregar('DASHBOARD', `Usuario autenticado: ${usuario.nombre1}`, 'info');
             
             // Mostrar datos del usuario en navbar
             document.getElementById('usuario-nombre').textContent = usuario.nombre1;
@@ -39,15 +48,30 @@ async function verificarAutenticacion() {
             // Mostrar opciones según el rol
             const esAdmin = usuario.rol === 1;
             mostrarOpcionesAdmin(esAdmin);
+            
+            Logger.agregar('DASHBOARD', 'Dashboard cargado correctamente', 'info');
         } else {
-            // Token inválido, redirigir a login
-            AuthService.logout();
-            window.location.href = 'login.html';
+            // Token inválido, mostrar logs y redirigir a login
+            Logger.agregar('DASHBOARD', `Error al obtener perfil: ${resultado.error}`, 'error');
+            mostrarAlerta('Sesión expirada, por favor inicia sesión de nuevo. Mostrando registros de depuración...', 'error');
+            setTimeout(() => {
+                Logger.mostrarModal();
+            }, 500);
+            setTimeout(() => {
+                AuthService.logout();
+                window.location.href = 'login.html';
+            }, 3000);
         }
     } catch (error) {
-        console.error('Error al verificar autenticación:', error);
-        AuthService.logout();
-        window.location.href = 'login.html';
+        Logger.agregar('DASHBOARD', `Error al verificar autenticación: ${error.message}`, 'error');
+        mostrarAlerta('Error de conexión, por favor intenta de nuevo. Mostrando registros de depuración...', 'error');
+        setTimeout(() => {
+            Logger.mostrarModal();
+        }, 500);
+        setTimeout(() => {
+            AuthService.logout();
+            window.location.href = 'login.html';
+        }, 3000);
     }
 }
 

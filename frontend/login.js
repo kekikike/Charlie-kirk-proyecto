@@ -32,6 +32,8 @@ async function handleLogin(e) {
     const contraseña = document.getElementById('login-contraseña').value;
     const recuerdame = document.getElementById('remember-checkbox').checked;
     
+    Logger.agregar('LOGIN', `Iniciando login con usuario: ${usuario}`, 'info');
+    
     // Validaciones básicas
     if (!usuario || !contraseña) {
         mostrarAlerta('Por favor, complete todos los campos', 'error');
@@ -40,11 +42,19 @@ async function handleLogin(e) {
     
     try {
         // Llamar al servicio de autenticación
+        Logger.agregar('LOGIN', 'Llamando a AuthService.login...', 'info');
         const resultado = await AuthService.login(usuario, contraseña);
+        
+        Logger.agregar('LOGIN', `Resultado del login: ${JSON.stringify(resultado)}`, 'info');
         
         if (resultado.success) {
             // Login exitoso
+            Logger.agregar('LOGIN', 'Login exitoso, guardando datos...', 'info');
             mostrarAlerta('¡Bienvenido!', 'success');
+            
+            // Verificar que el token se guardó correctamente
+            const tokenGuardado = localStorage.getItem('token');
+            Logger.agregar('LOGIN', `Token guardado: ${tokenGuardado ? 'SÍ' : 'NO'}`, 'info');
             
             // Guardar preferencia de "Recuérdame" si está marcado
             if (recuerdame) {
@@ -55,15 +65,19 @@ async function handleLogin(e) {
             }
             
             // Redirigir al dashboard después de 1.5 segundos
+            Logger.agregar('LOGIN', 'Redirigiendo a dashboard en 1.5 segundos...', 'info');
             setTimeout(() => {
+                Logger.agregar('LOGIN', 'Ejecutando redirección...', 'info');
                 window.location.href = 'index.html';
             }, 1500);
         } else {
             // Error en login
+            Logger.agregar('LOGIN', `Error en login: ${resultado.error}`, 'error');
             mostrarAlerta(resultado.error || 'Error al iniciar sesión', 'error');
             document.getElementById('login-contraseña').value = '';
         }
     } catch (error) {
+        Logger.agregar('LOGIN', `Error de conexión: ${error.message}`, 'error');
         mostrarAlerta('Error de conexión con el servidor', 'error');
     }
 }

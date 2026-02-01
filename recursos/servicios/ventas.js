@@ -3,6 +3,7 @@
  */
 
 const db = require('../config/conexion.js');
+const { encriptarDato, desencriptarDato, ocultarDato } = require('./encriptacion.js');
 
 /**
  * Crea una nueva venta con descuento de stock por lotes FIFO
@@ -10,15 +11,23 @@ const db = require('../config/conexion.js');
 const crearVenta = (datos, callback) => {
     const { ciempleado, subtotal, total, idmetodo, ci_nit, detalles } = datos;
 
+    // Encriptar datos sensibles de la venta
+    const ci_nit_enc = ci_nit ? encriptarDato(ci_nit) : null;
+    const ciempleado_enc = encriptarDato(ciempleado);
+
+    // Guardamos: 
+    // - ci_nit_enc (SOLO ENCRIPTADO - el CI del cliente)
+    // - ciempleado (sin encriptar - es FK y se necesita para JOIN)
+    // - ciempleado_enc (encriptado - para mostrar)
     const queryVenta = `
         INSERT INTO tventas
-        (ci_nit, ciempleado, subtotal, total, idmetodo, fechaventa, hora, fecharegistro, estado, usuarioA)
-        VALUES (?, ?, ?, ?, ?, CURDATE(), CURTIME(), NOW(), 1, ?)
+        (ci_nit_enc, ciempleado, ciempleado_enc, subtotal, total, idmetodo, fechaventa, hora, fecharegistro, estado, usuarioA)
+        VALUES (?, ?, ?, ?, ?, ?, CURDATE(), CURTIME(), NOW(), 1, ?)
     `;
 
     db.query(
         queryVenta,
-        [ci_nit || null, ciempleado, subtotal, total, idmetodo, ciempleado],
+        [ci_nit_enc, ciempleado, ciempleado_enc, subtotal, total, idmetodo, ciempleado],
         (err, result) => {
             if (err) return callback(err);
 
@@ -121,6 +130,9 @@ const obtenerVentas = (callback) => {
         SELECT 
             tv.idventa,
             tv.ciempleado,
+            tv.ciempleado_enc,
+            tv.ci_nit,
+            tv.ci_nit_enc,
             tv.subtotal,
             tv.total,
             tv.idmetodo,
@@ -129,10 +141,13 @@ const obtenerVentas = (callback) => {
             tv.estado,
             te.nombre1,
             te.apellido1,
+            tc.nombre as cliente_nombre,
+            tc.apellido as cliente_apellido,
             COUNT(tdv.iddetalle) AS cantidad_productos
         FROM tventas tv
         LEFT JOIN tmetodopago tm ON tv.idmetodo = tm.idmetodo
         LEFT JOIN templeados te ON tv.ciempleado = te.ciempleado
+        LEFT JOIN tclientes tc ON tv.ci_nit = tc.ci_nit
         LEFT JOIN tdetalleventa tdv ON tv.idventa = tdv.idventa
         GROUP BY tv.idventa
         ORDER BY tv.fecharegistro DESC
@@ -141,6 +156,85 @@ const obtenerVentas = (callback) => {
     db.query(query, (err, rows) => {
         if (err) return callback(err);
         callback(null, rows || []);
+    });
+};
+
+/**
+ * Obtiene ventas con control de acceso
+ * Si es vendedor, solo ve completas sus propias ventas
+ * Las de otros vendedores aparecen con datos ocultos (**)
+ * @param {number} ciempleado - ID del empleado (vendedor) que solicita
+ * @param {number} rol - Rol del usuario (1=admin, 2=vendedor)
+ * @param {Function} callback - Callback(err, ventas)
+ */
+const obtenerVentasConAcceso = (ciempleado, rol, callback) => {
+    const query = `
+        SELECT 
+            tv.idventa,
+            tv.ciempleado,
+            tv.ciempleado_enc,
+            tv.ci_nit_enc,
+            tv.subtotal,
+            tv.total,
+            tv.idmetodo,
+            tm.nombre AS metodo,
+            tv.fecharegistro,
+            tv.estado,
+            te.nombre1,
+            te.apellido1,
+            tc.nombre as cliente_nombre,
+            tc.apellido as cliente_apellido,
+            tc.ci_nit as cliente_ci,
+            COUNT(tdv.iddetalle) AS cantidad_productos
+        FROM tventas tv
+        LEFT JOIN tmetodopago tm ON tv.idmetodo = tm.idmetodo
+        LEFT JOIN templeados te ON tv.ciempleado = te.ciempleado
+        LEFT JOIN tclientes tc ON tv.ci_nit_enc IS NOT NULL
+        LEFT JOIN tdetalleventa tdv ON tv.idventa = tdv.idventa
+        GROUP BY tv.idventa
+        ORDER BY tv.fecharegistro DESC
+    `;
+
+    db.query(query, (err, rows) => {
+        if (err) return callback(err);
+        
+        // Si es administrador, retorna todo sin ocultar
+        if (rol === 1) {
+            // Desencriptar solo ci_nit_enc para admin
+            const ventasDesencriptadas = rows.map(venta => ({
+                ...venta,
+                ci_nit: venta.ci_nit_enc ? desencriptarDato(venta.ci_nit_enc) : null
+            }));
+            return callback(null, ventasDesencriptadas || []);
+        }
+        
+        // Si es vendedor, aplicar restricciones
+        const ventasControl = rows.map(venta => {
+            // Si la venta es de este vendedor, mostrar completo
+            if (parseInt(venta.ciempleado) === parseInt(ciempleado)) {
+                return {
+                    ...venta,
+                    ci_nit: venta.ci_nit_enc ? desencriptarDato(venta.ci_nit_enc) : null,
+                    cliente_nombre: venta.cliente_nombre,
+                    cliente_apellido: venta.cliente_apellido,
+                    cliente_ci: venta.cliente_ci,
+                    es_propia: true
+                };
+            } else {
+                // Si es de otro vendedor, ocultar datos del cliente y vendedor
+                return {
+                    ...venta,
+                    cliente_nombre: '**',
+                    cliente_apellido: '**',
+                    cliente_ci: '**',
+                    nombre1: '**',
+                    apellido1: '**',
+                    es_propia: false
+                };
+            }
+        });
+        
+        callback(null, ventasControl || []);
     });
 };
 
@@ -187,6 +281,7 @@ const obtenerMetodosPago = (callback) => {
 module.exports = {
     crearVenta,
     obtenerVentas,
+    obtenerVentasConAcceso,
     obtenerDetallesVenta,
     obtenerMetodosPago
 };
