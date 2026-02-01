@@ -2,6 +2,8 @@
  * dashboard.js - Maneja la lógica del dashboard principal
  * Gestiona navegación entre secciones, carga de datos y protección de autenticación
  */
+const TIEMPO_MAX_INACTIVIDAD = 0.10 * 60 * 1000; // 10 minutos
+let temporizadorInactividad;
 
 // Verificar autenticación al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
@@ -2230,3 +2232,25 @@ async function crearRespaldo() {
     }
 }
 
+function cerrarSesionPorInactividad() {
+    localStorage.clear();
+    sessionStorage.clear();
+    alert('Sesión cerrada por inactividad');
+    window.location.href = 'login.html';
+}
+
+function reiniciarTemporizador() {
+    clearTimeout(temporizadorInactividad);
+    temporizadorInactividad = setTimeout(
+        cerrarSesionPorInactividad,
+        TIEMPO_MAX_INACTIVIDAD
+    );
+}
+
+['click', 'mousemove', 'keydown', 'scroll'].forEach(evento => {
+    document.addEventListener(evento, reiniciarTemporizador);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    reiniciarTemporizador();
+});
