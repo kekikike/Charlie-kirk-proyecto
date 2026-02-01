@@ -1,162 +1,188 @@
-/**
- * Servicios de Clientes - Lógica de negocio para gestión de clientes
- */
-
+const crypto = require('crypto');
 const db = require('../config/conexion.js');
 
-/**
- * Crea un nuevo cliente
- * @param {Object} datos - Datos del cliente
- * @param {Function} callback - Callback(err, resultado)
- */
+/* =========================
+   CONFIG CIFRADO
+   ========================= */
+
+const ALGORITHM = 'aes-256-cbc';
+const KEY = crypto
+    .createHash('sha256')
+    .update(process.env.SECRET_KEY || 'clave_secreta_no_seas_favio')
+    .digest();
+
+/* =========================
+   CIFRAR
+   ========================= */
+
+function cifrar(texto) {
+    if (!texto) return texto;
+
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv(ALGORITHM, KEY, iv);
+    let encrypted = cipher.update(texto, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+
+    return iv.toString('hex') + ':' + encrypted;
+}
+
+/* =========================
+   DESCIFRAR CON FALLBACK
+   ========================= */
+
+function descifrar(texto) {
+    try {
+        if (!texto || typeof texto !== 'string') return texto;
+        if (!texto.includes(':')) return texto; // texto plano viejo
+
+        const [ivHex, encryptedText] = texto.split(':');
+        const iv = Buffer.from(ivHex, 'hex');
+        const decipher = crypto.createDecipheriv(ALGORITHM, KEY, iv);
+
+        let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+
+        return decrypted;
+    } catch (error) {
+        // si falla, asumimos texto plano
+        return texto;
+    }
+}
+
+/* =========================
+   CREAR CLIENTE
+   ========================= */
+
 const crearCliente = (datos, callback) => {
     const { ci_nit, nombre, apellido, correo, usuarioA } = datos;
-    
+
     const query = `
-        INSERT INTO tclientes (ci_nit, nombre, apellido, correo, estado, usuarioA)
+        INSERT INTO tclientes
+        (ci_nit, nombre, apellido, correo, estado, usuarioA)
         VALUES (?, ?, ?, ?, 1, ?)
     `;
-    
-    db.query(query, [ci_nit, nombre, apellido, correo, usuarioA], (err, result) => {
-        if (err) {
-            console.error('[CLIENTES] Error al insertar:', err.message);
-            return callback(err, null);
-        }
-        
-        // Retornar los datos del cliente creado
-        const clienteCreado = {
+
+    db.query(
+        query,
+        [
             ci_nit,
-            nombre,
-            apellido,
-            correo,
-            estado: 1
-        };
-        
-        callback(null, clienteCreado);
-    });
+            cifrar(nombre),
+            cifrar(apellido),
+            cifrar(correo),
+            usuarioA
+        ],
+        (err) => {
+            if (err) return callback(err, null);
+            callback(null, { ci_nit });
+        }
+    );
 };
 
-/**
- * Obtiene lista de todos los clientes
- * @param {Function} callback - Callback(err, clientes)
- */
+/* =========================
+   OBTENER CLIENTES
+   ========================= */
+
 const obtenerClientes = (callback) => {
     const query = `
-        SELECT 
-            ci_nit,
-            nombre,
-            apellido,
-            correo,
-            fecharegistro,
-            estado
+        SELECT ci_nit, nombre, apellido, correo, fecharegistro, estado
         FROM tclientes
         WHERE estado = 1
-        ORDER BY fecharegistro DESC
     `;
-    
-    db.query(query, (err, clientes) => {
-        if (err) {
-            console.error('[CLIENTES] Error al obtener:', err.message);
-            return callback(err, null);
-        }
-        
-        callback(null, clientes || []);
+
+    db.query(query, (err, results) => {
+        if (err) return callback(err, null);
+
+        const clientes = results.map(c => ({
+            ci_nit: c.ci_nit,
+            nombre: descifrar(c.nombre),
+            apellido: descifrar(c.apellido),
+            correo: descifrar(c.correo),
+            fecharegistro: c.fecharegistro,
+            estado: c.estado
+        }));
+
+        callback(null, clientes);
     });
 };
 
-/**
- * Obtiene un cliente por su ID (C.I./NIT)
- * @param {number} ci_nit - C.I./NIT del cliente
- * @param {Function} callback - Callback(err, cliente)
- */
+/* =========================
+   OBTENER CLIENTE POR CI
+   ========================= */
+
 const obtenerClientePorId = (ci_nit, callback) => {
     const query = `
-        SELECT 
-            ci_nit,
-            nombre,
-            apellido,
-            correo,
-            fecharegistro,
-            estado
+        SELECT *
         FROM tclientes
         WHERE ci_nit = ? AND estado = 1
     `;
-    
+
     db.query(query, [ci_nit], (err, results) => {
-        if (err) {
-            console.error('[CLIENTES] Error al obtener por ID:', err.message);
-            return callback(err, null);
-        }
-        
-        callback(null, results.length > 0 ? results[0] : null);
+        if (err) return callback(err, null);
+        if (!results.length) return callback(null, null);
+
+        const c = results[0];
+
+        callback(null, {
+            ci_nit: c.ci_nit,
+            nombre: descifrar(c.nombre),
+            apellido: descifrar(c.apellido),
+            correo: descifrar(c.correo),
+            fecharegistro: c.fecharegistro,
+            estado: c.estado
+        });
     });
 };
 
-/**
- * Actualiza un cliente
- * @param {number} ci_nit - C.I./NIT del cliente
- * @param {Object} datos - Datos a actualizar
- * @param {Function} callback - Callback(err, resultado)
- */
+/* =========================
+   ACTUALIZAR CLIENTE
+   ========================= */
+
 const actualizarCliente = (ci_nit, datos, callback) => {
-    const { nombre, apellido, correo } = datos;
-    
-    let campos = [];
-    let valores = [];
-    
-    if (nombre) {
+    const campos = [];
+    const valores = [];
+
+    if (datos.nombre) {
         campos.push('nombre = ?');
-        valores.push(nombre);
+        valores.push(cifrar(datos.nombre));
     }
-    if (apellido) {
+
+    if (datos.apellido) {
         campos.push('apellido = ?');
-        valores.push(apellido);
+        valores.push(cifrar(datos.apellido));
     }
-    if (correo) {
+
+    if (datos.correo) {
         campos.push('correo = ?');
-        valores.push(correo);
+        valores.push(cifrar(datos.correo));
     }
-    
-    if (campos.length === 0) {
-        return callback(new Error('No hay campos para actualizar'), null);
+
+    if (!campos.length) {
+        return callback(new Error('Nada para actualizar'), null);
     }
-    
+
     valores.push(ci_nit);
-    
-    const query = `UPDATE tclientes SET ${campos.join(', ')} WHERE ci_nit = ?`;
-    
-    db.query(query, valores, (err, result) => {
-        if (err) {
-            console.error('[CLIENTES] Error al actualizar:', err.message);
-            return callback(err, null);
-        }
-        
-        callback(null, { ci_nit, ...datos });
+
+    const query = `
+        UPDATE tclientes
+        SET ${campos.join(', ')}
+        WHERE ci_nit = ?
+    `;
+
+    db.query(query, valores, (err) => {
+        if (err) return callback(err, null);
+        callback(null, { ci_nit });
     });
 };
 
-/**
- * Elimina (desactiva) un cliente
- * @param {number} ci_nit - C.I./NIT del cliente
- * @param {Function} callback - Callback(err, resultado)
- */
-const eliminarCliente = (ci_nit, callback) => {
-    const query = `UPDATE tclientes SET estado = 0 WHERE ci_nit = ?`;
-    
-    db.query(query, [ci_nit], (err, result) => {
-        if (err) {
-            console.error('[CLIENTES] Error al eliminar:', err.message);
-            return callback(err, null);
-        }
-        
-        callback(null, { mensaje: 'Cliente desactivado', ci_nit });
-    });
-};
+/* =========================
+   EXPORTS
+   ========================= */
 
 module.exports = {
     crearCliente,
     obtenerClientes,
     obtenerClientePorId,
     actualizarCliente,
-    eliminarCliente
+    cifrar,
+    descifrar
 };

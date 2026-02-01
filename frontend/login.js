@@ -1,66 +1,77 @@
 /**
  * login.js - Maneja la lógica del formulario de login
- * Valida credenciales, llama al servicio de autenticación
- * y redirige al dashboard en caso de éxito
+ * Implementa bloqueo por intentos fallidos
  */
 
-// Cuando el DOM está listo
-document.addEventListener('DOMContentLoaded', function() {
-    // Limpiar caché si viene de un logout
+const MAX_INTENTOS = 3;
+const BLOQUEO_MINUTOS = 5;
+const BLOQUEO_MS = BLOQUEO_MINUTOS * 60 * 1000;
+
+document.addEventListener('DOMContentLoaded', function () {
     const params = new URLSearchParams(window.location.search);
     if (params.get('logout') === 'true') {
-        // Limpiar localStorage completamente
         localStorage.clear();
         sessionStorage.clear();
-        // Limpiar historial
         window.history.replaceState({}, document.title, window.location.pathname);
     }
-    
+
     const form = document.getElementById('login-form');
     form.addEventListener('submit', handleLogin);
 });
 
 /**
  * Maneja el envío del formulario de login
- * @param {Event} e - Evento del formulario
  */
 async function handleLogin(e) {
     e.preventDefault();
-    
-    // Obtener valores del formulario
+
+    // Verificar si está bloqueado
+    if (estaBloqueado()) {
+        const tiempoRestante = obtenerTiempoRestante();
+        mostrarAlerta(
+            `Demasiados intentos. Intente nuevamente en ${tiempoRestante} segundos.`,
+            'error'
+        );
+        return;
+    }
+
     const usuario = document.getElementById('login-usuario').value;
     const contraseña = document.getElementById('login-contraseña').value;
     const recuerdame = document.getElementById('remember-checkbox').checked;
-    
-    // Validaciones básicas
+
     if (!usuario || !contraseña) {
         mostrarAlerta('Por favor, complete todos los campos', 'error');
         return;
     }
-    
+
     try {
-        // Llamar al servicio de autenticación
         const resultado = await AuthService.login(usuario, contraseña);
-        
+
         if (resultado.success) {
-            // Login exitoso
+            // Login exitoso → limpiar intentos
+            reiniciarIntentos();
+
             mostrarAlerta('¡Bienvenido!', 'success');
-            
-            // Guardar preferencia de "Recuérdame" si está marcado
+
             if (recuerdame) {
-                localStorage.setItem('recordarUsuario', JSON.stringify({
-                    correo: usuario,
-                    timestamp: new Date().getTime()
-                }));
+                localStorage.setItem(
+                    'recordarUsuario',
+                    JSON.stringify({
+                        correo: usuario,
+                        timestamp: Date.now()
+                    })
+                );
             }
-            
-            // Redirigir al dashboard después de 1.5 segundos
+
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 1500);
         } else {
-            // Error en login
-            mostrarAlerta(resultado.error || 'Error al iniciar sesión', 'error');
+            registrarIntentoFallido();
+            mostrarAlerta(
+                resultado.error || 'Credenciales incorrectas',
+                'error'
+            );
             document.getElementById('login-contraseña').value = '';
         }
     } catch (error) {
@@ -69,18 +80,62 @@ async function handleLogin(e) {
 }
 
 /**
+ * Registra un intento fallido
+ */
+function registrarIntentoFallido() {
+    let intentos = Number(localStorage.getItem('login_intentos')) || 0;
+    intentos++;
+    localStorage.setItem('login_intentos', intentos);
+
+    if (intentos >= MAX_INTENTOS) {
+        localStorage.setItem('login_bloqueo', Date.now());
+    }
+}
+
+/**
+ * Verifica si el login está bloqueado
+ */
+function estaBloqueado() {
+    const bloqueo = Number(localStorage.getItem('login_bloqueo'));
+    if (!bloqueo) return false;
+
+    const ahora = Date.now();
+    if (ahora - bloqueo > BLOQUEO_MS) {
+        reiniciarIntentos();
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Obtiene tiempo restante de bloqueo en segundos
+ */
+function obtenerTiempoRestante() {
+    const bloqueo = Number(localStorage.getItem('login_bloqueo'));
+    const ahora = Date.now();
+    const restanteMs = BLOQUEO_MS - (ahora - bloqueo);
+    return Math.ceil(restanteMs / 1000);
+}
+
+/**
+ * Reinicia intentos y bloqueo
+ */
+function reiniciarIntentos() {
+    localStorage.removeItem('login_intentos');
+    localStorage.removeItem('login_bloqueo');
+}
+
+/**
  * Muestra una alerta al usuario
- * @param {string} mensaje - Mensaje a mostrar
- * @param {string} tipo - Tipo de alerta: 'success', 'error', 'info'
  */
 function mostrarAlerta(mensaje, tipo = 'info') {
     const alertElement = document.getElementById('alert');
-    
+
     alertElement.textContent = mensaje;
     alertElement.className = `alert alert-${tipo}`;
     alertElement.style.display = 'block';
-    
-    // Auto-ocultar después de 5 segundos
+
     setTimeout(() => {
         alertElement.style.display = 'none';
     }, 5000);

@@ -499,7 +499,7 @@ function mostrarEmpleados(empleados) {
         const rolNombre = emp.rol === 1 ? 'Administrador' : 'Vendedor';
         const badgeRol = emp.rol === 1 ? 'badge-admin' : 'badge-vendedor';
         const badgeEstado = emp.estado === 1 ? 'badge-activo' : 'badge-inactivo';
-        const estadoTexto = emp.estado === 1 ? 'Activo' : 'Inactivo';
+        const estadoTexto = emp.estado === 1 ? 'Inactivo' : 'Activo';
 
         return `
             <tr>
@@ -1906,7 +1906,7 @@ function mostrarClientes(clientes) {
     tbody.innerHTML = clientes.map(cliente => {
         const fechaRegistro = new Date(cliente.fecharegistro).toLocaleDateString('es-ES');
         const badgeEstado = cliente.estado === 1 ? 'badge-activo' : 'badge-inactivo';
-        const estadoTexto = cliente.estado === 1 ? 'Activo' : 'Inactivo';
+        const estadoTexto = cliente.estado === 1 ? 'Inactivo' : 'Activo';
 
         return `
             <tr>
