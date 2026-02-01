@@ -169,6 +169,11 @@ function cambiarSeccion(section) {
             cargarProductos();
         } else if (section === 'inventario') {
             cargarInventario();
+        } else if (section === 'respaldo') {
+            // Listar respaldos al mostrar la sección de respaldo
+            setTimeout(() => {
+                if (typeof listarRespaldos === 'function') listarRespaldos();
+            }, 200);
         }
     }
 }
@@ -2255,6 +2260,105 @@ async function crearRespaldo() {
         btnRespaldo.textContent = textoOriginal;
     }
 }
+
+/**
+ * Lista los respaldos disponibles desde el servidor y llena el select
+ */
+async function listarRespaldos() {
+    try {
+        const btn = document.getElementById('btn-listar-respaldos');
+        if (btn) btn.disabled = true;
+
+        const response = await fetch('http://localhost:3000/api/respaldo/listar', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${AuthService.getToken()}`
+            }
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Error al listar respaldos');
+        }
+
+        const data = await response.json();
+        const select = document.getElementById('backup-select');
+        const info = document.getElementById('respaldo-listado-info');
+
+        if (!select) return;
+
+        // Limpiar opciones
+        select.innerHTML = '<option value="">-- Seleccione un respaldo --</option>';
+
+        if (data.respaldos && data.respaldos.length > 0) {
+            data.respaldos.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.nombre;
+                opt.textContent = `${r.nombre} — ${r.tamaño_mb} MB — ${new Date(r.fechaModificacion).toLocaleString('es-BO')}`;
+                select.appendChild(opt);
+            });
+            info.textContent = `Encontrados ${data.respaldos.length} respaldos.`;
+        } else {
+            info.textContent = 'No se encontraron respaldos en el servidor.';
+        }
+
+    } catch (error) {
+        console.error('[RESPALDO] Error listando respaldos:', error);
+        mostrarAlerta(`Error listando respaldos: ${error.message}`, 'error');
+    } finally {
+        const btn = document.getElementById('btn-listar-respaldos');
+        if (btn) btn.disabled = false;
+    }
+}
+
+/**
+ * Restaura el respaldo seleccionado (solicita confirmación antes)
+ */
+async function restaurarRespaldoSeleccionado() {
+    const select = document.getElementById('backup-select');
+    if (!select) return mostrarAlerta('Selector de respaldos no encontrado', 'error');
+
+    const nombre = select.value;
+    if (!nombre) return mostrarAlerta('Por favor seleccione un archivo de respaldo', 'error');
+
+    if (!confirm('La restauración reemplazará la base de datos actual. ¿Desea continuar?')) return;
+
+    try {
+        const btn = document.getElementById('btn-restaurar');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⏳ Restaurando...';
+        }
+
+        const response = await fetch('http://localhost:3000/api/respaldo/restaurar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AuthService.getToken()}`
+            },
+            body: JSON.stringify({ nombreArchivo: nombre })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'Error al restaurar respaldo');
+        }
+
+        mostrarAlerta(data.mensaje || 'Restauración completada', 'success');
+
+    } catch (error) {
+        console.error('[RESPALDO] Error restaurando respaldo:', error);
+        mostrarAlerta(`Error restaurando respaldo: ${error.message}`, 'error');
+    } finally {
+        const btn = document.getElementById('btn-restaurar');
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '⚠️ Restaurar';
+        }
+    }
+}
+
+// removed override to avoid recursion; listing handled inside original cambiarSeccion
 
 function cerrarSesionPorInactividad() {
     localStorage.clear();

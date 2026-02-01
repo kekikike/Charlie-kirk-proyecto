@@ -728,11 +728,21 @@
 
                             <h3 style="margin-top: 40px;">Historial de Respaldos</h3>
                             <p style="color: #666;">Los respaldos se descargan automáticamente a tu carpeta de descargas.</p>
-                            <ul style="color: #666; line-height: 1.8;">
-                                <li>📄 Nombre del archivo: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">kirkmark_backup_YYYYMMDD_HHMMSS.sql</code></li>
-                                <li>📦 Contiene: Estructura y datos completos de todas las tablas</li>
-                                <li>🔒 Seguridad: Guarda el archivo en un lugar seguro</li>
-                            </ul>
+                            <div style="margin-top: 16px;">
+                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+                                    <button class="btn-secondary" id="btn-listar-respaldos" onclick="listarRespaldos()">🔄 Listar respaldos</button>
+                                    <span style="color:#666; font-size:0.95em">Selecciona un respaldo y presiona Restaurar</span>
+                                </div>
+
+                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+                                    <select id="backup-select" style="flex:1; padding:8px; border-radius:4px; border:1px solid #ddd;">
+                                        <option value="">-- Seleccione un respaldo --</option>
+                                    </select>
+                                    <button class="btn-primary" id="btn-restaurar" onclick="restaurarRespaldoSeleccionado()" style="padding:10px 16px;">⚠️ Restaurar</button>
+                                </div>
+
+                                <div id="respaldo-listado-info" style="color:#666; font-size:0.9em;"></div>
+                            </div>
                         </div>
                     </div>
                 </section>
