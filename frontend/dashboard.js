@@ -2411,3 +2411,48 @@ function respaldoAutomatico() {
 
 respaldoAutomatico();
 setInterval(respaldoAutomatico, 60 * 1000);
+
+
+function registrarAccionDashboard(usuario, accion, detalle = '') {
+    fetch('/api/logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario, accion, detalle })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) console.error('Error al enviar log:', data.error);
+    })
+    .catch(err => console.error('Error al conectar con servidor:', err));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Recuperar usuario logueado del localStorage "recordarUsuario"
+    const recordado = JSON.parse(localStorage.getItem('recordarUsuario') || '{}');
+    const usuarioCorreo = recordado.correo || 'Desconocido';
+
+    // Registrar todos los clicks automáticamente
+    document.body.addEventListener('click', (e) => {
+        const target = e.target.closest('button, a, input[type="button"], input[type="submit"]');
+        if (!target) return;
+        const accion = target.tagName.toLowerCase();
+        const detalle = target.textContent.trim() || target.id || target.name || 'Sin detalle';
+        registrarAccionDashboard(usuarioCorreo, 'Click', `${accion} - ${detalle}`);
+    });
+
+    // Registrar cambios en inputs
+    document.body.addEventListener('change', (e) => {
+        const target = e.target;
+        if (!target) return;
+        const accion = target.tagName.toLowerCase();
+        const detalle = target.name || target.id || 'Sin detalle';
+        registrarAccionDashboard(usuarioCorreo, 'Cambio', `${accion} - ${detalle} = ${target.value}`);
+    });
+
+    // Registrar envíos de formularios
+    document.body.addEventListener('submit', (e) => {
+        const form = e.target;
+        const detalle = form.id || form.name || 'Formulario sin id';
+        registrarAccionDashboard(usuarioCorreo, 'Submit', detalle);
+    });
+});
