@@ -54,9 +54,33 @@ const crearVenta = (req, res) => {
 /**
  * Obtener lista de ventas
  */
+/**
+ * Obtener lista de ventas (MODIFICADO PARA TRAER DATOS DEL CLIENTE)
+ */
 const obtenerVentas = (req, res) => {
-    servicios.obtenerVentas((err, ventas) => {
-        if (err) return res.status(500).json({ error: err.message });
+    // Esta consulta trae la venta + nombre/apellido/ci del cliente + nombre/apellido del empleado + nombre del método
+    const sql = `
+        SELECT 
+            v.*, 
+            c.nombre AS cliente_nom, 
+            c.apellido AS cliente_ape, 
+            c.ci_nit,
+            e.nombre1, 
+            e.apellido1,
+            m.nombre AS metodo,
+            (SELECT COUNT(*) FROM tdetalleventa WHERE idventa = v.idventa) as cantidad_productos
+        FROM tventas v
+        LEFT JOIN tclientes c ON v.ci_nit = c.ci_nit
+        INNER JOIN templeados e ON v.ciempleado = e.ciempleado
+        INNER JOIN tmetodopago m ON v.idmetodo = m.idmetodo
+        ORDER BY v.fecharegistro DESC
+    `;
+
+    db.query(sql, (err, ventas) => {
+        if (err) {
+            console.error('[HISTORIAL] Error SQL:', err.message);
+            return res.status(500).json({ error: err.message });
+        }
         
         res.json({ 
             mensaje: 'Ventas obtenidas exitosamente',
@@ -125,10 +149,30 @@ const generarTicket = (req, res) => {
         });
     });
 };
+
+// Ejemplo de cómo debe estar tu consulta en el controlador
+const obtenerVentaPorId = (req, res) => {
+    const { id } = req.params;
+    
+    // Consulta para obtener la venta y sus productos
+    const sql = `
+        SELECT dv.cantidad, dv.preciounitario, dv.subtotal, p.nombre as nombre_producto
+        FROM tdetalleventa dv
+        JOIN tproductos p ON dv.codproducto = p.codproducto
+        WHERE dv.idventa = ?`;
+
+    db.query(sql, [id], (err, detalles) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        // Aquí devuelves los detalles junto con lo que ya tenías
+        res.json({ detalles }); 
+    });
+};
 module.exports = {
     crearVenta,
     obtenerVentas,
     obtenerDetallesVenta,
     obtenerMetodosPago,
-    generarTicket // <--- Nueva
+    generarTicket, // <--- Nueva
+    obtenerVentaPorId // <--- Nueva
 };

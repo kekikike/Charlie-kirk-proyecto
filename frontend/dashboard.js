@@ -1612,26 +1612,31 @@ async function cargarHistorialVentas() {
 /**
  * Muestra el historial de ventas en la tabla
  */
+/**
+ * Muestra el historial de ventas en la tabla (MODIFICADO SOLO PARA EL CLICK)
+ */
 function mostrarHistorialVentas(ventas) {
     const tbody = document.getElementById('historial-ventas-lista');
 
     if (!ventas || ventas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">No hay ventas registradas</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay ventas registradas</td></tr>';
         return;
     }
 
-    // Busca esta parte en tu archivo de historial
     tbody.innerHTML = ventas.map(venta => {
         const fecha = new Date(venta.fecharegistro).toLocaleString('es-BO');
         const metodoClass = venta.idmetodo === 1 ? 'efectivo' : 'tarjeta';
         
+        // Aseguramos que el nombre se vea bien en la tabla principal
+        const nombreCliente = `${venta.cliente_nom || 'Sin nombre'} ${venta.cliente_ape || ''}`.trim();
+        
+        // Guardamos el objeto como string para el modal
+        const ventaString = JSON.stringify(venta).replace(/"/g, '&quot;');
+
         return `
-            <tr>
+            <tr onclick="verDetalleVentaRápido(${ventaString})" style="cursor: pointer;">
                 <td>${venta.idventa}</td>
                 <td>${fecha}</td>
-                
-                <td>${venta.cliente_nom || 'Sin nombre'} ${venta.cliente_ape || ''}</td>
-                
                 <td>${venta.nombre1} ${venta.apellido1 || ''}</td>
                 <td>${venta.cantidad_productos} producto(s)</td>
                 <td><strong>Bs. ${parseFloat(venta.total).toFixed(2)}</strong></td>
@@ -1640,6 +1645,76 @@ function mostrarHistorialVentas(ventas) {
         `;
     }).join('');
 }
+
+/**
+ * Función nueva para el Modal
+ */
+async function verDetalleVentaRápido(v) {
+    console.log("--- DATOS DE LA VENTA RECIBIDOS ---");
+    console.table(v);
+    document.getElementById('det-id').textContent = v.idventa;
+    const fecha = new Date(v.fecharegistro).toLocaleString('es-BO');
+    
+    // Construcción del nombre y carnet basada en tus tablas tclientes y tventas
+    // Dentro de verDetalleVentaRápido
+    const carnetCliente = v.ci_nit || 'S/N'; 
+    const nombreCompleto = (v.cliente_nom) ? `${v.cliente_nom} ${v.cliente_ape || ''}`.trim() : 'Cliente General';
+
+    const infoGeneralHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
+            <p><strong>Fecha/Hora:</strong><br> ${fecha}</p>
+            <p><strong>Método Pago:</strong><br> ${v.metodo}</p>
+            <p><strong>Cliente:</strong><br> ${nombreCompleto}</p>
+            <p><strong>CI/NIT:</strong><br> ${carnetCliente}</p>
+            <p><strong>Vendedor:</strong><br> ${v.nombre1} ${v.apellido1 || ''}</p>
+        </div>
+        <div style="margin-top: 15px;">
+            <strong>Productos:</strong>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 1px solid #eee;">
+                        <th style="width: 40px;">Cant.</th>
+                        <th>Descripción</th>
+                        <th style="text-align: right;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody id="det-tabla-productos">
+                    <tr><td colspan="3" style="text-align: center; padding: 10px;">Cargando productos...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 15px; text-align: right; border-top: 1px solid #eee; padding-top: 10px;">
+            <span style="font-size: 1.2em; font-weight: bold;">Total: Bs. ${parseFloat(v.total).toFixed(2)}</span>
+        </div>
+    `;
+    
+    document.getElementById('det-contenido').innerHTML = infoGeneralHTML;
+    document.getElementById('modal-detalle-venta').style.display = 'flex';
+
+    try {
+        // Tu controlador usa el parámetro :idventa según la definición
+        const response = await fetch(`http://localhost:3000/api/ventas/${v.idventa}`, {
+            headers: { 'Authorization': `Bearer ${AuthService.getToken()}` }
+        });
+        const data = await response.json();
+        const tablaProd = document.getElementById('det-tabla-productos');
+        
+        if (data.detalles && data.detalles.length > 0) {
+            tablaProd.innerHTML = data.detalles.map(p => `
+                <tr style="border-bottom: 1px solid #fafafa;">
+                    <td style="padding: 5px 0; border-bottom: 1px solid #f0f0f0;">${p.cantidad}</td>
+                    <td style="border-bottom: 1px solid #f0f0f0;">${p.nombre_producto}</td>
+                    <td style="text-align: right; border-bottom: 1px solid #f0f0f0;">Bs. ${parseFloat(p.subtotal).toFixed(2)}</td>
+                </tr>
+            `).join('');
+        } else {
+            tablaProd.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 10px;">No hay detalles</td></tr>';
+        }
+    } catch (error) {
+        document.getElementById('det-tabla-productos').innerHTML = '<tr><td colspan="3" style="color: red; text-align: center;">Error al cargar productos</td></tr>';
+    }
+}
+
 
 /**
  * Carga datos cuando cambia de sección (override parcial de cambiarSeccion)
