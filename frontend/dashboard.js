@@ -2,6 +2,8 @@
  * dashboard.js - Maneja la lógica del dashboard principal
  * Gestiona navegación entre secciones, carga de datos y protección de autenticación
  */
+const TIEMPO_MAX_INACTIVIDAD = 0.10 * 60 * 1000; // 10 minutos
+let temporizadorInactividad;
 
 // Verificar autenticación al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
@@ -523,7 +525,7 @@ function mostrarEmpleados(empleados) {
         const rolNombre = emp.rol === 1 ? 'Administrador' : 'Vendedor';
         const badgeRol = emp.rol === 1 ? 'badge-admin' : 'badge-vendedor';
         const badgeEstado = emp.estado === 1 ? 'badge-activo' : 'badge-inactivo';
-        const estadoTexto = emp.estado === 1 ? 'Activo' : 'Inactivo';
+        const estadoTexto = emp.estado === 1 ? 'Inactivo' : 'Activo';
 
         return `
             <tr>
@@ -1930,7 +1932,7 @@ function mostrarClientes(clientes) {
     tbody.innerHTML = clientes.map(cliente => {
         const fechaRegistro = new Date(cliente.fecharegistro).toLocaleDateString('es-ES');
         const badgeEstado = cliente.estado === 1 ? 'badge-activo' : 'badge-inactivo';
-        const estadoTexto = cliente.estado === 1 ? 'Activo' : 'Inactivo';
+        const estadoTexto = cliente.estado === 1 ? 'Inactivo' : 'Activo';
 
         return `
             <tr>
@@ -2254,3 +2256,25 @@ async function crearRespaldo() {
     }
 }
 
+function cerrarSesionPorInactividad() {
+    localStorage.clear();
+    sessionStorage.clear();
+    alert('Sesión cerrada por inactividad');
+    window.location.href = 'login.html';
+}
+
+function reiniciarTemporizador() {
+    clearTimeout(temporizadorInactividad);
+    temporizadorInactividad = setTimeout(
+        cerrarSesionPorInactividad,
+        TIEMPO_MAX_INACTIVIDAD
+    );
+}
+
+['click', 'mousemove', 'keydown', 'scroll'].forEach(evento => {
+    document.addEventListener(evento, reiniciarTemporizador);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    reiniciarTemporizador();
+});
