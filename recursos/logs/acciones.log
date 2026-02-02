@@ -282,3 +282,86 @@
 [2026-02-02 01:52:58] Usuario: Desconocido | Acción: Click | button - ✓ Finalizar Venta
 [2026-02-02 01:53:03] Usuario: Desconocido | Acción: Click | a - 📦 Productos
 [2026-02-02 01:53:04] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:56:24] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:56:41] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 01:56:43] Usuario: Desconocido | Acción: Click | button - + Nuevo Cliente
+[2026-02-02 01:56:52] Usuario: Desconocido | Acción: Cambio | input - cli-ci = 13182896
+[2026-02-02 01:56:59] Usuario: Desconocido | Acción: Cambio | input - cli-nombre = Martin
+[2026-02-02 01:57:01] Usuario: Desconocido | Acción: Cambio | input - cli-apellido = Tejeda
+[2026-02-02 01:57:07] Usuario: Desconocido | Acción: Cambio | input - cli-correo = mateg@gmail.com
+[2026-02-02 01:57:07] Usuario: Desconocido | Acción: Click | button - Guardar Cliente
+[2026-02-02 01:57:07] Usuario: Desconocido | Acción: Submit | form-cliente
+[2026-02-02 01:57:11] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:57:17] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 01:57:19] Usuario: Desconocido | Acción: Cambio | input - buscar-cliente-ci = 13182896
+[2026-02-02 01:57:21] Usuario: Desconocido | Acción: Click | button - Buscar
+[2026-02-02 01:57:25] Usuario: Desconocido | Acción: Cambio | input - buscar-producto = s
+[2026-02-02 01:57:27] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:57:27] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:57:27] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:57:27] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:57:27] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:57:28] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:57:29] Usuario: Desconocido | Acción: Click | button - −
+[2026-02-02 01:57:30] Usuario: Desconocido | Acción: Click | button - 💵
+                                            Efectivo
+[2026-02-02 01:57:31] Usuario: Desconocido | Acción: Click | button - ✓ Finalizar Venta
+[2026-02-02 01:57:41] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:57:54] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:57:57] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:58:00] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:58:03] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:58:15] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 02:03:49] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 02:03:50] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 02:03:53] Usuario: Desconocido | Acción: Click | button - + Nuevo Cliente
+[2026-02-02 02:03:57] Usuario: Desconocido | Acción: Cambio | input - cli-ci = 131313
+[2026-02-02 02:03:59] Usuario: Desconocido | Acción: Cambio | input - cli-nombre = j
+[2026-02-02 02:04:00] Usuario: Desconocido | Acción: Cambio | input - cli-apellido = p
+[2026-02-02 02:04:07] Usuario: Desconocido | Acción: Cambio | input - cli-correo = jp@gmail.com
+[2026-02-02 02:04:07] Usuario: Desconocido | Acción: Click | button - Guardar Cliente
+[2026-02-02 02:04:07] Usuario: Desconocido | Acción: Submit | form-cliente
+[2026-02-02 02:04:10] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 02:04:13] Usuario: Desconocido | Acción: Cambio | input - buscar-cliente-ci = 131313
+[2026-02-02 02:04:13] Usuario: Desconocido | Acción: Click | button - Buscar
+[2026-02-02 02:04:16] Usuario: Desconocido | Acción: Cambio | input - buscar-producto = s
+[2026-02-02 02:04:18] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 02:04:18] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 02:04:19] Usuario: Desconocido | Acción: Click | button - −
+[2026-02-02 02:04:21] Usuario: Desconocido | Acción: Click | button - 💵
+                                            Efectivo
+[2026-02-02 02:04:22] Usuario: Desconocido | Acción: Click | button - ✓ Finalizar Venta
+[2026-02-02 02:04:25] Usuario: Desconocido | Acción: Click | a - 📦 Productos
+[2026-02-02 02:04:25] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 02:04:31] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 02:04:34] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 02:04:54] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 02:05:03] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 02:05:10] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 02:06:56] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 02:06:58] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 02:07:07] Usuario: Desconocido | Acción: Click | a - 📦 Productos
+[2026-02-02 02:07:09] Usuario: Desconocido | Acción: Click | a - 📊 Inventario
+[2026-02-02 02:07:09] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 02:07:12] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 02:07:16] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 02:07:19] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 02:07:20] Usuario: Desconocido | Acción: Click | button - + Nuevo Cliente
+[2026-02-02 02:07:23] Usuario: Desconocido | Acción: Cambio | input - cli-ci = 121212
+[2026-02-02 02:07:24] Usuario: Desconocido | Acción: Cambio | input - cli-nombre = a
+[2026-02-02 02:07:26] Usuario: Desconocido | Acción: Cambio | input - cli-apellido = b
+[2026-02-02 02:07:31] Usuario: Desconocido | Acción: Cambio | input - cli-correo = ab@gmai.com
+[2026-02-02 02:07:32] Usuario: Desconocido | Acción: Click | button - Guardar Cliente
+[2026-02-02 02:07:32] Usuario: Desconocido | Acción: Submit | form-cliente
+[2026-02-02 02:07:42] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 02:07:42] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 02:07:42] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 02:07:47] Usuario: Desconocido | Acción: Cambio | input - buscar-cliente-ci = 121212
+[2026-02-02 02:07:47] Usuario: Desconocido | Acción: Click | button - Buscar
+[2026-02-02 02:07:51] Usuario: Desconocido | Acción: Cambio | input - buscar-producto = s
+[2026-02-02 02:07:52] Usuario: Desconocido | Acción: Click | button - 💵
+                                            Efectivo
+[2026-02-02 02:07:53] Usuario: Desconocido | Acción: Click | button - ✓ Finalizar Venta
+[2026-02-02 02:08:05] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 02:08:08] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 02:08:13] Usuario: Desconocido | Acción: Click | button - ×

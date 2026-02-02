@@ -69,9 +69,9 @@ const crearCliente = (datos, callback) => {
         query,
         [
             ci_nit,
-            cifrar(nombre),
-            cifrar(apellido),
-            cifrar(correo),
+            nombre,
+            apellido,
+            correo,
             telefono_enc,
             usuarioA
         ],
@@ -185,17 +185,17 @@ const actualizarCliente = (ci_nit, datos, callback) => {
 
     if (datos.nombre) {
         campos.push('nombre = ?');
-        valores.push(cifrar(datos.nombre));
+        valores.push(datos.nombre);
     }
 
     if (datos.apellido) {
         campos.push('apellido = ?');
-        valores.push(cifrar(datos.apellido));
+        valores.push(datos.apellido);
     }
 
     if (datos.correo) {
         campos.push('correo = ?');
-        valores.push(cifrar(datos.correo));
+        valores.push(datos.correo);
     }
 
     if (datos.telefono) {
