@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (form) {
         form.addEventListener('submit', handleLogin);
     }
-    
+
     // Cargar usuario recordado si existe
     const recordado = localStorage.getItem('recordarUsuario');
     if (recordado) {

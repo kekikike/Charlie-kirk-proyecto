@@ -99,14 +99,15 @@ const crearEmpleado = (datos, callback) => {
     const correo_enc = encriptarDato(correo);
     const telefono_enc = encriptarDato(telefono);
 
-    // IMPORTANTE: NO guardamos correo y telefono sin encriptar, SOLO los encriptados
+    // Guardamos tanto la versión encriptada (para seguridad/visualización) 
+    // como la plana (para búsquedas exactas como el login)
     const query = `
         INSERT INTO templeados 
-        (ciempleado, nombre1, nombre2, apellido1, apellido2, fechanac, sexo, correo_enc, contraseña, telefono_enc, rol, estado, usuarioA) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
+        (ciempleado, nombre1, nombre2, apellido1, apellido2, fechanac, sexo, correo, correo_enc, contraseña, telefono, telefono_enc, rol, estado, usuarioA) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
     `;
 
-    db.query(query, [ciempleado, nombre1, nombre2 || null, apellido1, apellido2 || null, fechanac, sexo, correo_enc, contraseña, telefono_enc, rol, usuarioA], 
+    db.query(query, [ciempleado, nombre1, nombre2 || null, apellido1, apellido2 || null, fechanac, sexo, correo, correo_enc, contraseña, telefono, telefono_enc, rol, usuarioA],
         (err, results) => {
             if (err) return callback(err, null);
             callback(null, { ciempleado, nombre1, apellido1, correo });
@@ -133,7 +134,7 @@ const obtenerPerfilCompleto = (ciempleado, callback) => {
     db.query(query, [ciempleado], (err, results) => {
         if (err) return callback(err, null);
         if (results.length === 0) return callback(null, null);
-        
+
         const perfil = results[0];
         // Desencriptar datos sensibles
         const perfilDesencriptado = {
@@ -141,7 +142,7 @@ const obtenerPerfilCompleto = (ciempleado, callback) => {
             correo: perfil.correo_enc ? desencriptarDato(perfil.correo_enc) : null,
             telefono: perfil.telefono_enc ? desencriptarDato(perfil.telefono_enc) : null
         };
-        
+
         callback(null, perfilDesencriptado);
     });
 };
@@ -163,17 +164,28 @@ const obtenerListaEmpleados = (callback) => {
 
     db.query(query, (err, results) => {
         if (err) return callback(err, null);
-        
+
         // Desencriptar datos sensibles
-        const empleadosDesencriptados = results.map(emp => ({
-            ...emp,
-            correo: emp.correo_enc ? desencriptarDato(emp.correo_enc) : null,
-            telefono: emp.telefono_enc ? desencriptarDato(emp.telefono_enc) : null
-        }));
-        
+        const empleadosDesencriptados = results.map(emp => {
+            try {
+                return {
+                    ...emp,
+                    correo: emp.correo_enc ? desencriptarDato(emp.correo_enc) : null,
+                    telefono: emp.telefono_enc ? desencriptarDato(emp.telefono_enc) : null
+                };
+            } catch (e) {
+                console.error(`Error desencriptando empleado ${emp.ciempleado}:`, e);
+                return {
+                    ...emp,
+                    correo: 'Error desencriptando',
+                    telefono: 'Error desencriptando'
+                };
+            }
+        });
+
         callback(null, empleadosDesencriptados || []);
     });
-};;
+};
 
 /**
  * Actualiza el estado de un empleado
@@ -183,7 +195,7 @@ const obtenerListaEmpleados = (callback) => {
  */
 const actualizarEstadoEmpleado = (ciempleado, estado, callback) => {
     const query = 'UPDATE templeados SET estado = ? WHERE ciempleado = ?';
-    
+
     db.query(query, [estado, ciempleado], (err, results) => {
         if (err) return callback(err, null);
         if (results.affectedRows === 0) {
@@ -200,7 +212,7 @@ const actualizarEstadoEmpleado = (ciempleado, estado, callback) => {
  */
 const eliminarEmpleado = (ciempleado, callback) => {
     const query = 'DELETE FROM templeados WHERE ciempleado = ?';
-    
+
     db.query(query, [ciempleado], (err, results) => {
         if (err) return callback(err, null);
         if (results.affectedRows === 0) {

@@ -9,3 +9,276 @@
 [2026-02-01 22:46:36] Usuario: Desconocido | Acción: Click | button - Salir
 [2026-02-01 22:46:45] Usuario: willibarb2502@gmail.com | Acción: Click | a - 📊 Inventario
 [2026-02-01 22:46:46] Usuario: willibarb2502@gmail.com | Acción: Click | a - 👥 Clientes
+[2026-02-02 00:54:57] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 00:54:58] Usuario: Desconocido | Acción: Click | a - 📦 Productos
+[2026-02-02 00:55:03] Usuario: Desconocido | Acción: Click | a - 📊 Inventario
+[2026-02-02 00:55:15] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 00:55:22] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 00:55:28] Usuario: Desconocido | Acción: Click | a - 👥 Usuarios
+[2026-02-02 00:55:38] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 00:57:46] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 00:58:04] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 00:58:05] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 00:58:12] Usuario: Desconocido | Acción: Click | a - 👥 Usuarios
+[2026-02-02 00:58:13] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 00:58:13] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 00:58:31] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 00:58:37] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 00:58:42] Usuario: Desconocido | Acción: Cambio | input - buscar-cliente-ci = 111
+[2026-02-02 00:58:42] Usuario: Desconocido | Acción: Click | button - Buscar
+[2026-02-02 00:58:50] Usuario: Desconocido | Acción: Cambio | input - buscar-producto = s
+[2026-02-02 00:58:52] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 00:58:52] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 00:58:53] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 00:58:53] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 00:58:54] Usuario: Desconocido | Acción: Click | button - 📱
+                                            QR
+[2026-02-02 00:59:03] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 00:59:08] Usuario: Desconocido | Acción: Click | button - ✓ Finalizar Venta
+[2026-02-02 00:59:23] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 00:59:37] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 00:59:44] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:06:15] Usuario: Desconocido | Acción: Click | a - 👥 Usuarios
+[2026-02-02 01:06:23] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 01:15:05] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 01:15:15] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:15:25] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:15:29] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:15:36] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:15:47] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:15:56] Usuario: Desconocido | Acción: Click | button - + Nuevo Empleado
+[2026-02-02 01:16:00] Usuario: Desconocido | Acción: Cambio | input - nombre1 = M
+[2026-02-02 01:16:04] Usuario: Desconocido | Acción: Cambio | input - nombre1 = Martin
+[2026-02-02 01:16:09] Usuario: Desconocido | Acción: Cambio | input - nombre2 = Diego
+[2026-02-02 01:16:10] Usuario: Desconocido | Acción: Cambio | input - apellido1 = Te
+[2026-02-02 01:16:22] Usuario: Desconocido | Acción: Cambio | input - apellido1 = Tejeda
+[2026-02-02 01:16:24] Usuario: Desconocido | Acción: Cambio | input - apellido2 = Gutierrez
+[2026-02-02 01:16:26] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0002-11-13
+[2026-02-02 01:16:26] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0020-11-13
+[2026-02-02 01:16:26] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0200-11-13
+[2026-02-02 01:16:27] Usuario: Desconocido | Acción: Cambio | input - fechanac = 2001-11-13
+[2026-02-02 01:16:28] Usuario: Desconocido | Acción: Cambio | input - fechanac = 20012-11-13
+[2026-02-02 01:16:28] Usuario: Desconocido | Acción: Cambio | input - fechanac = 200120-11-13
+[2026-02-02 01:16:28] Usuario: Desconocido | Acción: Cambio | input - fechanac = 1200-11-13
+[2026-02-02 01:16:30] Usuario: Desconocido | Acción: Cambio | input - fechanac = 12004-11-13
+[2026-02-02 01:16:31] Usuario: Desconocido | Acción: Cambio | input - fechanac = 
+[2026-02-02 01:16:32] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0002-11-13
+[2026-02-02 01:16:32] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0020-11-13
+[2026-02-02 01:16:33] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0200-11-13
+[2026-02-02 01:16:33] Usuario: Desconocido | Acción: Cambio | input - fechanac = 2004-11-13
+[2026-02-02 01:16:35] Usuario: Desconocido | Acción: Cambio | select - sexo = 1
+[2026-02-02 01:16:35] Usuario: Desconocido | Acción: Cambio | select - sexo = 0
+[2026-02-02 01:16:36] Usuario: Desconocido | Acción: Cambio | select - sexo = 1
+[2026-02-02 01:16:36] Usuario: Desconocido | Acción: Cambio | select - sexo = 
+[2026-02-02 01:16:37] Usuario: Desconocido | Acción: Cambio | select - sexo = 1
+[2026-02-02 01:16:41] Usuario: Desconocido | Acción: Cambio | input - correo = d.martin.tejeda.g@gmail.com
+[2026-02-02 01:16:49] Usuario: Desconocido | Acción: Cambio | input - telefono = 67146870
+[2026-02-02 01:16:51] Usuario: Desconocido | Acción: Cambio | select - rol = 2
+[2026-02-02 01:16:57] Usuario: Desconocido | Acción: Cambio | input - contraseña = 123456
+[2026-02-02 01:16:59] Usuario: Desconocido | Acción: Cambio | input - confirmar-contraseña = 123456
+[2026-02-02 01:17:00] Usuario: Desconocido | Acción: Click | button - Registrar Usuario
+[2026-02-02 01:17:00] Usuario: Desconocido | Acción: Submit | form-usuario
+[2026-02-02 01:17:07] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:22:41] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 01:22:43] Usuario: Desconocido | Acción: Click | button - Editar
+[2026-02-02 01:22:46] Usuario: Desconocido | Acción: Click | button - Editar
+[2026-02-02 01:22:47] Usuario: Desconocido | Acción: Click | button - Editar
+[2026-02-02 01:22:47] Usuario: Desconocido | Acción: Click | button - Editar
+[2026-02-02 01:22:47] Usuario: Desconocido | Acción: Click | button - Editar
+[2026-02-02 01:22:53] Usuario: Desconocido | Acción: Click | button - Activar
+[2026-02-02 01:22:56] Usuario: Desconocido | Acción: Click | button - Activar
+[2026-02-02 01:22:59] Usuario: Desconocido | Acción: Click | button - Activar
+[2026-02-02 01:23:01] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 01:23:05] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:23:29] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 01:23:32] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 01:23:36] Usuario: Desconocido | Acción: Click | button - Activar
+[2026-02-02 01:23:43] Usuario: Desconocido | Acción: Click | button - Eliminar
+[2026-02-02 01:23:44] Usuario: Desconocido | Acción: Click | button - + Nuevo Empleado
+[2026-02-02 01:23:47] Usuario: Desconocido | Acción: Cambio | input - nombre1 = Martin
+[2026-02-02 01:23:48] Usuario: Desconocido | Acción: Cambio | input - nombre2 = Diego
+[2026-02-02 01:23:50] Usuario: Desconocido | Acción: Cambio | input - apellido1 = Tejeda
+[2026-02-02 01:23:51] Usuario: Desconocido | Acción: Cambio | input - apellido2 = Gutierrez
+[2026-02-02 01:23:54] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0002-11-13
+[2026-02-02 01:23:54] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0020-11-13
+[2026-02-02 01:23:55] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0200-11-13
+[2026-02-02 01:23:55] Usuario: Desconocido | Acción: Cambio | input - fechanac = 2004-11-13
+[2026-02-02 01:23:58] Usuario: Desconocido | Acción: Cambio | select - sexo = 0
+[2026-02-02 01:23:59] Usuario: Desconocido | Acción: Cambio | select - sexo = 1
+[2026-02-02 01:24:01] Usuario: Desconocido | Acción: Cambio | input - correo = d.martin.tejeda.g@gmail.com
+[2026-02-02 01:24:02] Usuario: Desconocido | Acción: Cambio | input - telefono = 67146870
+[2026-02-02 01:24:10] Usuario: Desconocido | Acción: Cambio | select - rol = 2
+[2026-02-02 01:24:16] Usuario: Desconocido | Acción: Cambio | input - contraseña = 131313
+[2026-02-02 01:24:19] Usuario: Desconocido | Acción: Cambio | input - confirmar-contraseña = 131313
+[2026-02-02 01:24:19] Usuario: Desconocido | Acción: Click | button - Registrar Usuario
+[2026-02-02 01:24:19] Usuario: Desconocido | Acción: Submit | form-usuario
+[2026-02-02 01:24:25] Usuario: Desconocido | Acción: Click | a - 📊 Inventario
+[2026-02-02 01:24:26] Usuario: Desconocido | Acción: Click | a - 📦 Productos
+[2026-02-02 01:24:28] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:24:32] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 01:24:36] Usuario: Desconocido | Acción: Click | button - Activar
+[2026-02-02 01:24:43] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:25:12] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 01:25:18] Usuario: Desconocido | Acción: Click | button - Editar
+[2026-02-02 01:25:26] Usuario: Desconocido | Acción: Click | button - Eliminar
+[2026-02-02 01:25:27] Usuario: Desconocido | Acción: Click | button - ← Volver
+[2026-02-02 01:25:33] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:25:43] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:25:45] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:27:59] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:28:25] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:28:30] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:28:36] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:28:38] Usuario: Desconocido | Acción: Click | a - 📦 Productos
+[2026-02-02 01:28:41] Usuario: Desconocido | Acción: Click | button - Editar
+[2026-02-02 01:28:43] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:28:44] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 01:28:44] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 01:28:51] Usuario: Desconocido | Acción: Click | button - Activar
+[2026-02-02 01:28:52] Usuario: Desconocido | Acción: Click | button - + Nuevo Empleado
+[2026-02-02 01:28:55] Usuario: Desconocido | Acción: Cambio | input - nombre1 = p
+[2026-02-02 01:29:00] Usuario: Desconocido | Acción: Cambio | input - nombre1 = Martin
+[2026-02-02 01:29:01] Usuario: Desconocido | Acción: Cambio | input - nombre2 = Diego
+[2026-02-02 01:29:03] Usuario: Desconocido | Acción: Cambio | input - apellido1 = Tejeda
+[2026-02-02 01:29:04] Usuario: Desconocido | Acción: Cambio | input - apellido2 = Gutierrez
+[2026-02-02 01:29:08] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0002-11-13
+[2026-02-02 01:29:08] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0020-11-13
+[2026-02-02 01:29:08] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0200-11-13
+[2026-02-02 01:29:08] Usuario: Desconocido | Acción: Cambio | input - fechanac = 2004-11-13
+[2026-02-02 01:29:11] Usuario: Desconocido | Acción: Cambio | select - sexo = 1
+[2026-02-02 01:29:15] Usuario: Desconocido | Acción: Cambio | input - correo = mateg@gmail.com
+[2026-02-02 01:29:17] Usuario: Desconocido | Acción: Cambio | input - telefono = 67146870
+[2026-02-02 01:29:19] Usuario: Desconocido | Acción: Cambio | select - rol = 2
+[2026-02-02 01:29:27] Usuario: Desconocido | Acción: Cambio | input - contraseña = 131313
+[2026-02-02 01:29:32] Usuario: Desconocido | Acción: Cambio | input - confirmar-contraseña = 131313
+[2026-02-02 01:29:32] Usuario: Desconocido | Acción: Click | button - Registrar Usuario
+[2026-02-02 01:29:32] Usuario: Desconocido | Acción: Submit | form-usuario
+[2026-02-02 01:29:40] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:30:15] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 01:33:03] Usuario: Desconocido | Acción: Click | button - + Nuevo Empleado
+[2026-02-02 01:33:06] Usuario: Desconocido | Acción: Cambio | input - nombre1 = a
+[2026-02-02 01:33:07] Usuario: Desconocido | Acción: Cambio | input - nombre2 = b
+[2026-02-02 01:33:08] Usuario: Desconocido | Acción: Cambio | input - apellido1 = c
+[2026-02-02 01:33:09] Usuario: Desconocido | Acción: Cambio | input - apellido2 = d
+[2026-02-02 01:33:11] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0002-11-11
+[2026-02-02 01:33:12] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0020-11-11
+[2026-02-02 01:33:12] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0201-11-11
+[2026-02-02 01:33:12] Usuario: Desconocido | Acción: Cambio | input - fechanac = 2011-11-11
+[2026-02-02 01:33:16] Usuario: Desconocido | Acción: Cambio | select - sexo = 1
+[2026-02-02 01:33:21] Usuario: Desconocido | Acción: Cambio | input - correo = a@gmail.com
+[2026-02-02 01:33:25] Usuario: Desconocido | Acción: Cambio | input - telefono = 13131313
+[2026-02-02 01:33:27] Usuario: Desconocido | Acción: Cambio | select - rol = 2
+[2026-02-02 01:33:29] Usuario: Desconocido | Acción: Cambio | input - contraseña = 131313
+[2026-02-02 01:33:32] Usuario: Desconocido | Acción: Cambio | input - confirmar-contraseña = 131313
+[2026-02-02 01:33:32] Usuario: Desconocido | Acción: Click | button - Registrar Usuario
+[2026-02-02 01:33:32] Usuario: Desconocido | Acción: Submit | form-usuario
+[2026-02-02 01:36:51] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:37:14] Usuario: Desconocido | Acción: Click | a - 👔 Empleados
+[2026-02-02 01:37:18] Usuario: Desconocido | Acción: Click | button - Eliminar
+[2026-02-02 01:37:21] Usuario: Desconocido | Acción: Click | button - Eliminar
+[2026-02-02 01:37:21] Usuario: Desconocido | Acción: Click | button - + Nuevo Empleado
+[2026-02-02 01:37:25] Usuario: Desconocido | Acción: Cambio | input - nombre1 = Martin
+[2026-02-02 01:37:26] Usuario: Desconocido | Acción: Cambio | input - nombre2 = Diego
+[2026-02-02 01:37:27] Usuario: Desconocido | Acción: Cambio | input - apellido1 = Tejeda
+[2026-02-02 01:37:28] Usuario: Desconocido | Acción: Cambio | input - apellido2 = Gutierrez
+[2026-02-02 01:37:31] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0002-11-13
+[2026-02-02 01:37:31] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0020-11-13
+[2026-02-02 01:37:32] Usuario: Desconocido | Acción: Cambio | input - fechanac = 0200-11-13
+[2026-02-02 01:37:32] Usuario: Desconocido | Acción: Cambio | input - fechanac = 2004-11-13
+[2026-02-02 01:37:33] Usuario: Desconocido | Acción: Cambio | select - sexo = 1
+[2026-02-02 01:37:38] Usuario: Desconocido | Acción: Cambio | input - correo = d.martin.tejeda.g@gmail.com
+[2026-02-02 01:37:41] Usuario: Desconocido | Acción: Cambio | input - telefono = 67146870
+[2026-02-02 01:37:44] Usuario: Desconocido | Acción: Cambio | select - rol = 2
+[2026-02-02 01:37:46] Usuario: Desconocido | Acción: Cambio | input - contraseña = 131313
+[2026-02-02 01:37:48] Usuario: Desconocido | Acción: Cambio | input - confirmar-contraseña = 131313
+[2026-02-02 01:37:49] Usuario: Desconocido | Acción: Click | button - Registrar Usuario
+[2026-02-02 01:37:49] Usuario: Desconocido | Acción: Submit | form-usuario
+[2026-02-02 01:38:16] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:38:25] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 01:38:29] Usuario: Desconocido | Acción: Cambio | input - buscar-cliente-ci = 111
+[2026-02-02 01:38:30] Usuario: Desconocido | Acción: Click | button - Buscar
+[2026-02-02 01:38:33] Usuario: Desconocido | Acción: Cambio | input - buscar-producto = s
+[2026-02-02 01:38:35] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:38:35] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:38:36] Usuario: Desconocido | Acción: Click | button - 💵
+                                            Efectivo
+[2026-02-02 01:38:37] Usuario: Desconocido | Acción: Click | button - ✓ Finalizar Venta
+[2026-02-02 01:38:43] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:38:48] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:38:58] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:39:00] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:39:02] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:39:05] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:39:08] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:39:25] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:39:32] Usuario: Desconocido | Acción: Cambio | input - buscar-cliente-ci = 111
+[2026-02-02 01:39:34] Usuario: Desconocido | Acción: Click | button - Buscar
+[2026-02-02 01:39:36] Usuario: Desconocido | Acción: Cambio | input - buscar-producto = a
+[2026-02-02 01:39:38] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:39:39] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:39:40] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:39:40] Usuario: Desconocido | Acción: Click | button - +
+[2026-02-02 01:39:41] Usuario: Desconocido | Acción: Click | button - 📱
+                                            QR
+[2026-02-02 01:39:47] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:39:48] Usuario: Desconocido | Acción: Click | button - ✓ Finalizar Venta
+[2026-02-02 01:39:58] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:40:01] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:40:02] Usuario: Desconocido | Acción: Click | a - 📦 Productos
+[2026-02-02 01:40:07] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 01:40:12] Usuario: Desconocido | Acción: Click | a - 👥 Clientes
+[2026-02-02 01:40:12] Usuario: Desconocido | Acción: Click | a - 📊 Inventario
+[2026-02-02 01:40:22] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:40:29] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:44:28] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:45:08] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 01:45:09] Usuario: Desconocido | Acción: Click | a - 📦 Productos
+[2026-02-02 01:45:09] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:45:15] Usuario: Desconocido | Acción: Click | a - 📊 Inventario
+[2026-02-02 01:45:34] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:45:39] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:46:10] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:46:14] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:47:19] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:47:22] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:47:26] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:47:28] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:47:31] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:47:33] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:47:37] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:48:09] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 01:51:23] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:51:28] Usuario: Desconocido | Acción: Click | button - Salir
+[2026-02-02 01:51:43] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:51:48] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:51:50] Usuario: Desconocido | Acción: Click | a - 📜 Historial
+[2026-02-02 01:51:50] Usuario: Desconocido | Acción: Click | a - 💰 Ventas
+[2026-02-02 01:51:52] Usuario: Desconocido | Acción: Cambio | input - buscar-cliente-ci = 111
+[2026-02-02 01:51:55] Usuario: Desconocido | Acción: Click | button - Buscar
+[2026-02-02 01:51:57] Usuario: Desconocido | Acción: Cambio | input - buscar-producto = s
+[2026-02-02 01:51:58] Usuario: Desconocido | Acción: Click | button - 💳
+                                            Tarjeta Débito
+[2026-02-02 01:52:26] Usuario: Desconocido | Acción: Cambio | input - num-tarjeta = 1231123112311231
+[2026-02-02 01:52:27] Usuario: Desconocido | Acción: Cambio | input - exp-mes = 12
+[2026-02-02 01:52:29] Usuario: Desconocido | Acción: Cambio | input - exp-anio = 2025
+[2026-02-02 01:52:31] Usuario: Desconocido | Acción: Cambio | input - cvv-tarjeta = 132
+[2026-02-02 01:52:33] Usuario: Desconocido | Acción: Cambio | input - f-nombre = m
+[2026-02-02 01:52:34] Usuario: Desconocido | Acción: Cambio | input - f-apellido = t
+[2026-02-02 01:52:36] Usuario: Desconocido | Acción: Cambio | input - Sin detalle = a
+[2026-02-02 01:52:43] Usuario: Desconocido | Acción: Cambio | input - f-tel = 77775184
+[2026-02-02 01:52:45] Usuario: Desconocido | Acción: Cambio | input - f-cp = 0000
+[2026-02-02 01:52:45] Usuario: Desconocido | Acción: Click | button - Validar y Pagar
+[2026-02-02 01:52:45] Usuario: Desconocido | Acción: Submit | form-pago-completo
+[2026-02-02 01:52:46] Usuario: Desconocido | Acción: Click | button - Validar y Pagar
+[2026-02-02 01:52:46] Usuario: Desconocido | Acción: Submit | form-pago-completo
+[2026-02-02 01:52:46] Usuario: Desconocido | Acción: Click | button - Validar y Pagar
+[2026-02-02 01:52:46] Usuario: Desconocido | Acción: Submit | form-pago-completo
+[2026-02-02 01:52:46] Usuario: Desconocido | Acción: Click | button - Validar y Pagar
+[2026-02-02 01:52:46] Usuario: Desconocido | Acción: Submit | form-pago-completo
+[2026-02-02 01:52:50] Usuario: Desconocido | Acción: Click | button - ×
+[2026-02-02 01:52:51] Usuario: Desconocido | Acción: Click | button - 📱
+                                            QR
+[2026-02-02 01:52:57] Usuario: Desconocido | Acción: Click | button - Cerrar
+[2026-02-02 01:52:58] Usuario: Desconocido | Acción: Click | button - ✓ Finalizar Venta
+[2026-02-02 01:53:03] Usuario: Desconocido | Acción: Click | a - 📦 Productos
+[2026-02-02 01:53:04] Usuario: Desconocido | Acción: Click | a - 📜 Historial

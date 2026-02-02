@@ -6,7 +6,7 @@ const TIEMPO_MAX_INACTIVIDAD = 10 * 60 * 1000; // 10 minutos
 let temporizadorInactividad;
 
 // Verificar autenticación al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     verificarAutenticacion();
     configurarNavegacion();
     configurarFormulario();
@@ -19,38 +19,38 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 async function verificarAutenticacion() {
     Logger.agregar('DASHBOARD', 'Verificando autenticación...', 'info');
-    
+
     if (!AuthService.estaAutenticado()) {
         Logger.agregar('DASHBOARD', 'No hay token, redirigiendo a login', 'warn');
         window.location.href = 'login.html';
         return;
     }
-    
+
     Logger.agregar('DASHBOARD', 'Token encontrado, obteniendo perfil...', 'info');
-    
+
     try {
         // Obtener datos del usuario
         const resultado = await AuthService.obtenerPerfil();
-        
+
         Logger.agregar('DASHBOARD', `Resultado de perfil: ${JSON.stringify(resultado)}`, 'info');
-        
+
         if (resultado.success) {
             const usuario = resultado.data;
-            
+
             Logger.agregar('DASHBOARD', `Usuario autenticado: ${usuario.nombre1}`, 'info');
-            
+
             // Mostrar datos del usuario en navbar
             document.getElementById('usuario-nombre').textContent = usuario.nombre1;
-            document.getElementById('usuario-rol').textContent = 
+            document.getElementById('usuario-rol').textContent =
                 usuario.rol === 1 ? 'Administrador' : 'Vendedor';
-            
+
             // Actualizar breadcrumb
             actualizarBreadcrumb(usuario.nombre1);
-            
+
             // Mostrar opciones según el rol
             const esAdmin = usuario.rol === 1;
             mostrarOpcionesAdmin(esAdmin);
-            
+
             Logger.agregar('DASHBOARD', 'Dashboard cargado correctamente', 'info');
         } else {
             // Token inválido, mostrar logs y redirigir a login
@@ -96,7 +96,7 @@ function mostrarOpcionesAdmin(esAdmin) {
     const navEmpleados = document.getElementById('nav-empleados');
     const navUsuarios = document.getElementById('nav-usuarios');
     const navRespaldo = document.getElementById('nav-respaldo');
-    
+
     if (esAdmin) {
         if (navEmpleados) navEmpleados.style.display = 'block';
         if (navUsuarios) navUsuarios.style.display = 'block';
@@ -113,13 +113,13 @@ function mostrarOpcionesAdmin(esAdmin) {
  */
 function configurarNavegacion() {
     const navItems = document.querySelectorAll('.nav-item');
-    
+
     navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
+        item.addEventListener('click', function (e) {
             e.preventDefault();
             const section = this.getAttribute('data-section');
             cambiarSeccion(section);
-            
+
             // Actualizar clase activa en menú
             navItems.forEach(n => n.classList.remove('active'));
             this.classList.add('active');
@@ -134,14 +134,17 @@ function configurarNavegacion() {
 function cambiarSeccion(section) {
     // Ocultar todas las secciones
     const sections = document.querySelectorAll('.section');
-    sections.forEach(sec => sec.classList.remove('active'));
-    
+    sections.forEach(sec => {
+        sec.classList.remove('active');
+        sec.style.display = 'none';
+    });
+
     // Mostrar la sección seleccionada
     const selectedSection = document.getElementById(section + '-section');
     if (selectedSection) {
         selectedSection.classList.add('active');
         selectedSection.style.display = 'block';
-        
+
         // Actualizar breadcrumb
         const sectionNames = {
             'dashboard': 'Inicio',
@@ -154,14 +157,16 @@ function cambiarSeccion(section) {
             'ajustes': 'Ajustes',
             'historial': 'Historial'
         };
-        
+
         const breadcrumb = document.getElementById('breadcrumb');
         if (breadcrumb) {
             breadcrumb.innerHTML = `<span class="breadcrumb-item">${sectionNames[section] || 'Inicio'}</span>`;
         }
-        
+
         // Cargar datos específicos de la sección
-        if (section === 'usuarios') {
+        if (section === 'dashboard') {
+            cargarDatos();
+        } else if (section === 'usuarios') {
             limpiarFormulario();
         } else if (section === 'empleados') {
             cargarEmpleados();
@@ -218,7 +223,7 @@ function configurarFormulario() {
  */
 async function handleRegistrarUsuario(e) {
     e.preventDefault();
-    
+
     // Obtener valores
     const nombre1 = document.getElementById('nombre1').value;
     const nombre2 = document.getElementById('nombre2').value;
@@ -231,23 +236,23 @@ async function handleRegistrarUsuario(e) {
     const contraseña = document.getElementById('contraseña').value;
     const confirmarContraseña = document.getElementById('confirmar-contraseña').value;
     const rol = document.getElementById('rol').value;
-    
+
     // Validaciones
     if (!nombre1 || !apellido1 || !correo || !telefono || !fechanac || !sexo || !contraseña || !rol) {
         mostrarAlerta('Por favor, complete todos los campos requeridos', 'error');
         return;
     }
-    
+
     if (contraseña !== confirmarContraseña) {
         mostrarAlerta('Las contraseñas no coinciden', 'error');
         return;
     }
-    
+
     if (contraseña.length < 6) {
         mostrarAlerta('La contraseña debe tener al menos 6 caracteres', 'error');
         return;
     }
-    
+
     try {
         // Llamar al servicio de registro
         const userData = {
@@ -262,9 +267,9 @@ async function handleRegistrarUsuario(e) {
             contraseña,
             rol: parseInt(rol)
         };
-        
+
         const resultado = await AuthService.registrarUsuario(userData);
-        
+
         if (resultado.success) {
             mostrarAlerta('Usuario registrado exitosamente', 'success');
             limpiarFormulario();
@@ -354,13 +359,13 @@ async function handleActualizarProducto(codproducto) {
         }
 
         mostrarAlerta('Producto actualizado exitosamente', 'success');
-        
+
         // Restaurar handler original
         const form = document.getElementById('form-producto');
         form.onsubmit = null;
         form.removeEventListener('submit', form.onsubmit);
         form.addEventListener('submit', handleCrearProducto);
-        
+
         cerrarModalProducto();
         cargarProductos();
     } catch (error) {
@@ -428,8 +433,32 @@ function limpiarFormulario() {
  * Carga datos iniciales del dashboard
  */
 async function cargarDatos() {
-    // Por ahora solo mostramos valores de demostración
-    // En el futuro se conectarán a endpoints reales
+    console.log('[DASHBOARD] Cargando estadísticas...');
+    try {
+        const response = await fetch('http://localhost:3000/api/ventas/estadisticas', {
+            headers: {
+                'Authorization': `Bearer ${AuthService.getToken()}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Error al cargar estadísticas');
+
+        const { stats } = await response.json();
+
+        // Actualizar DOM
+        const elVentas = document.getElementById('total-ventas');
+        const elProductos = document.getElementById('total-productos');
+        const elClientes = document.getElementById('total-clientes');
+        const elTransacciones = document.getElementById('total-transacciones');
+
+        if (elVentas) elVentas.textContent = `Bs. ${parseFloat(stats.ventas.total_ventas).toFixed(2)}`;
+        if (elProductos) elProductos.textContent = stats.productos;
+        if (elClientes) elClientes.textContent = stats.clientes;
+        if (elTransacciones) elTransacciones.textContent = stats.ventas.cantidad_ventas;
+
+    } catch (error) {
+        console.error('[DASHBOARD] Error:', error);
+    }
 }
 
 /**
@@ -478,11 +507,11 @@ function cerrarSesion() {
  */
 function mostrarAlerta(mensaje, tipo = 'info') {
     const alertElement = document.getElementById('alert');
-    
+
     alertElement.textContent = mensaje;
     alertElement.className = `alert alert-${tipo}`;
     alertElement.style.display = 'block';
-    
+
     // Auto-ocultar después de 5 segundos
     setTimeout(() => {
         alertElement.style.display = 'none';
@@ -518,7 +547,7 @@ async function cargarEmpleados() {
  */
 function mostrarEmpleados(empleados) {
     const tbody = document.getElementById('empleados-lista');
-    
+
     if (!empleados || empleados.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No hay empleados registrados</td></tr>';
         return;
@@ -544,10 +573,10 @@ function mostrarEmpleados(empleados) {
                 <td>
                     <div class="acciones-tabla">
                         <button class="btn-accion btn-editar" onclick="editarEmpleado(${emp.ciempleado})">Editar</button>
-                        ${emp.estado === 1 
-                            ? `<button class="btn-accion btn-desactivar" onclick="desactivarEmpleado(${emp.ciempleado})">Desactivar</button>`
-                            : `<button class="btn-accion btn-desactivar" onclick="activarEmpleado(${emp.ciempleado})">Activar</button>`
-                        }
+                        ${emp.estado === 1
+                ? `<button class="btn-accion btn-desactivar" onclick="desactivarEmpleado(${emp.ciempleado})">Desactivar</button>`
+                : `<button class="btn-accion btn-desactivar" onclick="activarEmpleado(${emp.ciempleado})">Activar</button>`
+            }
                         <button class="btn-accion btn-eliminar" onclick="eliminarEmpleado(${emp.ciempleado})">Eliminar</button>
                     </div>
                 </td>
@@ -663,7 +692,7 @@ async function cargarProductos() {
     try {
         const token = AuthService.getToken();
         console.log('[CARGAR PRODUCTOS] Token:', token ? 'Presente' : 'Ausente');
-        
+
         const response = await fetch('http://localhost:3000/api/productos', {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -671,7 +700,7 @@ async function cargarProductos() {
         });
 
         console.log('[CARGAR PRODUCTOS] Response status:', response.status);
-        
+
         if (!response.ok) {
             throw new Error('Error al cargar productos');
         }
@@ -693,10 +722,10 @@ async function cargarCategorias() {
     try {
         const response = await fetch('http://localhost:3000/api/productos/categorias');
         const data = await response.json();
-        
+
         const selectCategoria = document.getElementById('producto-categoria');
         selectCategoria.innerHTML = '<option value="">Seleccione una categoría</option>';
-        
+
         data.categorias.forEach(cat => {
             const option = document.createElement('option');
             option.value = cat.idcategoria;
@@ -715,12 +744,12 @@ async function cargarCategorias() {
 function mostrarProductos(productos) {
     console.log('[MOSTRAR PRODUCTOS] Iniciando renderizado');
     const tbody = document.getElementById('productos-lista');
-    
+
     if (!tbody) {
         console.error('[MOSTRAR PRODUCTOS] No se encontró elemento productos-lista');
         return;
     }
-    
+
     if (!productos || productos.length === 0) {
         console.log('[MOSTRAR PRODUCTOS] No hay productos para mostrar');
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay productos registrados</td></tr>';
@@ -728,15 +757,15 @@ function mostrarProductos(productos) {
     }
 
     console.log(`[MOSTRAR PRODUCTOS] Renderizando ${productos.length} productos`);
-    
+
     tbody.innerHTML = productos.map(prod => {
         console.log(`[MOSTRAR PRODUCTOS] Procesando: ${prod.codproducto}, estado=${prod.estado}, tipo=${typeof prod.estado}`);
-        
+
         // Convertir a número para comparar correctamente
         const estado = parseInt(prod.estado);
         const badgeEstado = estado === 1 ? 'badge-activo' : 'badge-inactivo';
         const estadoTexto = estado === 1 ? 'Activo' : 'Inactivo';
-        
+
         console.log(`[MOSTRAR PRODUCTOS] ${prod.codproducto}: estado convertido=${estado}, badge=${badgeEstado}`);
 
         return `
@@ -750,10 +779,10 @@ function mostrarProductos(productos) {
                 <td>
                     <div class="acciones-tabla">
                         <button class="btn-accion btn-editar" onclick="editarProducto('${prod.codproducto}', '${prod.nombre}', ${prod.idcategoria}, ${prod.preciounitario})">Editar</button>
-                        ${parseInt(prod.estado) === 1 
-                            ? `<button class="btn-accion btn-desactivar" onclick="desactivarProducto('${prod.codproducto}')">Desactivar</button>`
-                            : `<button class="btn-accion btn-desactivar" onclick="activarProductoConValidacion('${prod.codproducto}')">Activar</button>`
-                        }
+                        ${parseInt(prod.estado) === 1
+                ? `<button class="btn-accion btn-desactivar" onclick="desactivarProducto('${prod.codproducto}')">Desactivar</button>`
+                : `<button class="btn-accion btn-desactivar" onclick="activarProductoConValidacion('${prod.codproducto}')">Activar</button>`
+            }
                         <button class="btn-accion btn-eliminar" onclick="eliminarProductoConfirm('${prod.codproducto}')">Eliminar</button>
                     </div>
                 </td>
@@ -770,13 +799,13 @@ function abrirFormularioProducto() {
     document.getElementById('modal-producto').style.display = 'flex';
     document.getElementById('modal-titulo').textContent = 'Nuevo Producto';
     document.getElementById('form-producto').reset();
-    
+
     // Asegurar que el handler es el correcto para crear
     const form = document.getElementById('form-producto');
     form.onsubmit = null;
     form.removeEventListener('submit', form.onsubmit);
     form.addEventListener('submit', handleCrearProducto);
-    
+
     cargarCategorias();
 }
 
@@ -786,13 +815,13 @@ function abrirFormularioProducto() {
 function cerrarModalProducto() {
     document.getElementById('modal-producto').classList.remove('active');
     document.getElementById('modal-producto').style.display = 'none';
-    
+
     // Restaurar handler original del formulario
     const form = document.getElementById('form-producto');
     form.removeEventListener('submit', form.onsubmit);
     form.onsubmit = null;
     form.addEventListener('submit', handleCrearProducto);
-    
+
     // Limpiar campos
     document.getElementById('form-producto').reset();
 }
@@ -807,7 +836,7 @@ function editarProducto(codproducto, nombre, idcategoria, preciounitario) {
     document.getElementById('producto-nombre').value = nombre;
     document.getElementById('producto-categoria').value = idcategoria;
     document.getElementById('producto-precio').value = preciounitario;
-    
+
     // Crear un nuevo form submit handler para edición
     const form = document.getElementById('form-producto');
     const handleEdicion = async (e) => {
@@ -818,11 +847,11 @@ function editarProducto(codproducto, nombre, idcategoria, preciounitario) {
         // Restaurar el handler original para crear
         form.addEventListener('submit', handleCrearProducto);
     };
-    
+
     // Remover listeners anteriores
     form.removeEventListener('submit', handleCrearProducto);
     form.addEventListener('submit', handleEdicion);
-    
+
     cargarCategorias();
 }
 
@@ -848,7 +877,7 @@ async function desactivarProducto(codproducto) {
 
         const data = await response.json();
         console.log('Respuesta de desactivar:', data);
-        
+
         mostrarAlerta('Producto desactivado exitosamente', 'success');
         // Agregar delay para asegurar que la BD se actualice
         setTimeout(() => {
@@ -905,10 +934,10 @@ async function activarProducto(codproducto) {
     try {
         const token = AuthService.getToken();
         const url = `http://localhost:3000/api/productos/${codproducto}/activar`;
-        
+
         console.log(`[ACTIVAR PRODUCTO] URL: ${url}`);
         console.log(`[ACTIVAR PRODUCTO] Token presente: ${token ? 'Sí' : 'No'}`);
-        
+
         const response = await fetch(url, {
             method: 'PUT',
             headers: {
@@ -917,7 +946,7 @@ async function activarProducto(codproducto) {
         });
 
         console.log(`[ACTIVAR PRODUCTO] Response status: ${response.status}`);
-        
+
         if (!response.ok) {
             throw new Error('Error al activar producto');
         }
@@ -925,9 +954,9 @@ async function activarProducto(codproducto) {
         const data = await response.json();
         console.log('[ACTIVAR PRODUCTO] Respuesta:', data);
         console.log('[ACTIVAR PRODUCTO] Mostrando alerta de éxito');
-        
+
         mostrarAlerta('Producto activado exitosamente', 'success');
-        
+
         console.log(`[ACTIVAR PRODUCTO] Programando recarga de productos en 800ms`);
         // Agregar delay para asegurar que la BD se actualice
         setTimeout(() => {
@@ -969,7 +998,7 @@ async function cargarInventario() {
  */
 function mostrarInventario(lotes) {
     const tbody = document.getElementById('inventario-lista');
-    
+
     if (!lotes || lotes.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No hay lotes registrados</td></tr>';
         return;
@@ -1008,15 +1037,15 @@ async function abrirFormularioInventario() {
     document.getElementById('modal-inventario').classList.add('active');
     document.getElementById('modal-inventario').style.display = 'flex';
     document.getElementById('form-inventario').reset();
-    
+
     // Cargar productos
     try {
         const response = await fetch('http://localhost:3000/api/productos');
         const data = await response.json();
-        
+
         const selectProducto = document.getElementById('inventario-producto');
         selectProducto.innerHTML = '<option value="">Seleccione un producto</option>';
-        
+
         data.productos.forEach(prod => {
             const option = document.createElement('option');
             option.value = prod.codproducto;
@@ -1041,7 +1070,7 @@ function cerrarModalInventario() {
 function editarStock(codinventario) {
     const nuevoStock = prompt('Ingrese el nuevo stock:');
     if (nuevoStock === null || nuevoStock === '') return;
-    
+
     actualizarStock(codinventario, parseInt(nuevoStock));
 }
 
@@ -1162,9 +1191,9 @@ async function buscarProductos(termino) {
 
         const data = await response.json();
         const productos = data.productos || [];
-        
+
         const terminoLower = termino.toLowerCase();
-        const resultados = productos.filter(p => 
+        const resultados = productos.filter(p =>
             p.codproducto.toLowerCase().includes(terminoLower) ||
             p.nombre.toLowerCase().includes(terminoLower)
         );
@@ -1333,20 +1362,20 @@ function actualizarEstadoBtnFinalizar() {
  */
 function seleccionarMetodoPago(idmetodo) {
     metodoPagoSeleccionado = idmetodo;
-    
+
     // Actualizar botones visuales
     document.querySelectorAll('.metodo-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     document.querySelector(`[data-metodo="${idmetodo}"]`).classList.add('active');
-    
+
     // Guardar en input hidden
     document.getElementById('metodo-pago-seleccionado').value = idmetodo;
 
     // Actualizar estado del botón finalizar
     actualizarEstadoBtnFinalizar();
 
-    if (idmetodo === 3){
+    if (idmetodo === 3) {
         abrirModalQR();
     }
     if (idmetodo === 2) {
@@ -1371,7 +1400,7 @@ function abrirModalQR() {
         }
     }, 5000); //5 seg de espera pago GG
 }
-function cerrarModalQR(){
+function cerrarModalQR() {
     document.getElementById('modal-qr').style.display = 'none';
 }
 
@@ -1380,9 +1409,9 @@ function cerrarModalQR(){
 function abrirModalTarjeta() {
     const modal = document.getElementById('modal-tarjeta');
     modal.style.display = 'flex';
-    
+
     // Reseteamos el formulario por si lo cerraron antes
-    document.getElementById('form-pago-completo').reset(); 
+    document.getElementById('form-pago-completo').reset();
     document.getElementById('form-pago-completo').style.display = 'block';
     document.getElementById('exito-pago').style.display = 'none';
     document.getElementById('error-mensaje').style.display = 'none';
@@ -1414,7 +1443,7 @@ function procesarValidacion(event) {
     const mes = parseInt(document.getElementById('exp-mes').value);
 
     // --- VALIDACIONES ---
-    
+
     // Validar Tarjeta (Luhn)
     if (!validarLuhn(tarjeta) || tarjeta.length < 15) {
         mostrarError("Número de tarjeta inválido (Error de suma de verificación).");
@@ -1464,7 +1493,7 @@ function cerrarModalTarjeta() {
         btn.disabled = false;           // Volver a hacerlo clickable
         btn.innerText = "Validar y Pagar"; // Regresar el texto original
     }
-    
+
     // 3. Limpiar el formulario para la siguiente venta
     document.getElementById('form-pago-completo').reset();
 }
@@ -1544,11 +1573,11 @@ async function finalizarVenta() {
                     // Enviamos los productos con su nombre y cantidad
                     productos: productosVenta.map(p => ({
                         cantidad: p.cantidad,
-                        nombre: p.nombre, 
+                        nombre: p.nombre,
                         subtotal: p.subtotal
                     }))
                     // NOTA: No enviamos empleadoNombre aquí, el Backend lo pondrá solo
-                    
+
 
                 })
             });
@@ -1563,13 +1592,13 @@ async function finalizarVenta() {
         }
         // --- FIN BLOQUE PDF ---
         //const datosVenta = req.body; 
-        
+
         // El usuarioA lo sacamos del token (lo que tu amigo está arreglando)
         //datosVenta.usuarioA = req.usuario.nombre || 'Empleado';
         console.log('[FINALIZAR VENTA] Respuesta:', data);
 
         mostrarAlerta(`✓ Venta registrada exitosamente. ID: ${data.venta.idventa}`, 'success');
-        
+
         // Limpiar venta
         productosVenta = [];
         metodoPagoSeleccionado = null;
@@ -1582,7 +1611,7 @@ async function finalizarVenta() {
         document.getElementById('buscar-producto').value = '';
         mostrarProductosVenta();
         calcularResumen();
-        
+
         // Desabilitar sección de productos
         desabilitarSeccionProductos();
 
@@ -1657,10 +1686,10 @@ function mostrarHistorialVentas(ventas) {
     tbody.innerHTML = ventas.map(venta => {
         const fecha = new Date(venta.fecharegistro).toLocaleString('es-BO');
         const metodoClass = venta.idmetodo === 1 ? 'efectivo' : 'tarjeta';
-        
+
         // Aseguramos que el nombre se vea bien en la tabla principal
-        const nombreCliente = `${venta.cliente_nom || 'Sin nombre'} ${venta.cliente_ape || ''}`.trim();
-        
+        const nombreCliente = `${venta.cliente_nombre || 'Sin nombre'} ${venta.cliente_apellido || ''}`.trim();
+
         // Guardamos el objeto como string para el modal
         const ventaString = JSON.stringify(venta).replace(/"/g, '&quot;');
 
@@ -1685,11 +1714,11 @@ async function verDetalleVentaRápido(v) {
     console.table(v);
     document.getElementById('det-id').textContent = v.idventa;
     const fecha = new Date(v.fecharegistro).toLocaleString('es-BO');
-    
+
     // Construcción del nombre y carnet basada en tus tablas tclientes y tventas
     // Dentro de verDetalleVentaRápido
-    const carnetCliente = v.ci_nit || 'S/N'; 
-    const nombreCompleto = (v.cliente_nom) ? `${v.cliente_nom} ${v.cliente_ape || ''}`.trim() : 'Cliente General';
+    const carnetCliente = v.ci_nit || 'S/N';
+    const nombreCompleto = (v.cliente_nombre) ? `${v.cliente_nombre} ${v.cliente_apellido || ''}`.trim() : 'Cliente General';
 
     const infoGeneralHTML = `
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
@@ -1718,7 +1747,7 @@ async function verDetalleVentaRápido(v) {
             <span style="font-size: 1.2em; font-weight: bold;">Total: Bs. ${parseFloat(v.total).toFixed(2)}</span>
         </div>
     `;
-    
+
     document.getElementById('det-contenido').innerHTML = infoGeneralHTML;
     document.getElementById('modal-detalle-venta').style.display = 'flex';
 
@@ -1729,7 +1758,7 @@ async function verDetalleVentaRápido(v) {
         });
         const data = await response.json();
         const tablaProd = document.getElementById('det-tabla-productos');
-        
+
         if (data.detalles && data.detalles.length > 0) {
             tablaProd.innerHTML = data.detalles.map(p => `
                 <tr style="border-bottom: 1px solid #fafafa;">
@@ -1751,9 +1780,9 @@ async function verDetalleVentaRápido(v) {
  * Carga datos cuando cambia de sección (override parcial de cambiarSeccion)
  */
 const cambiarSeccionOriginal = window.cambiarSeccion;
-window.cambiarSeccion = function(section) {
+window.cambiarSeccion = function (section) {
     cambiarSeccionOriginal.call(this, section);
-    
+
     if (section === 'historial') {
         cargarHistorialVentas();
     } else if (section === 'ventas') {
@@ -1780,7 +1809,7 @@ let clienteSeleccionadoVenta = null;
  */
 async function buscarClientePorCI() {
     const ci = document.getElementById('buscar-cliente-ci').value.trim();
-    
+
     if (!ci) {
         mostrarAlerta('Por favor ingrese un C.I./NIT', 'error');
         return;
@@ -1818,7 +1847,7 @@ function habilitarSeccionProductos() {
     const seccionProductos = document.getElementById('seccion-productos');
     seccionProductos.style.opacity = '1';
     seccionProductos.style.pointerEvents = 'auto';
-    
+
     const inputBuscar = document.getElementById('buscar-producto');
     inputBuscar.disabled = false;
 }
@@ -1830,7 +1859,7 @@ function desabilitarSeccionProductos() {
     const seccionProductos = document.getElementById('seccion-productos');
     seccionProductos.style.opacity = '0.5';
     seccionProductos.style.pointerEvents = 'none';
-    
+
     const inputBuscar = document.getElementById('buscar-producto');
     inputBuscar.disabled = true;
 }
@@ -1840,15 +1869,15 @@ function desabilitarSeccionProductos() {
  */
 function mostrarClienteSeleccionado(cliente) {
     document.getElementById('cliente-seleccionado-id').value = cliente.ci_nit;
-    document.getElementById('cliente-seleccionado').textContent = 
+    document.getElementById('cliente-seleccionado').textContent =
         `✓ ${cliente.nombre} ${cliente.apellido} (C.I.: ${cliente.ci_nit})`;
-    
+
     const contenedor = document.getElementById('cliente-info-contenedor');
     contenedor.style.display = 'block';
-    
+
     // Ocultar input de búsqueda
     document.querySelector('.cliente-busqueda').style.display = 'none';
-    
+
     // Actualizar estado del botón finalizar
     actualizarEstadoBtnFinalizar();
 }
@@ -1863,16 +1892,16 @@ function limpiarClienteVenta() {
     document.querySelector('.cliente-busqueda').style.display = 'flex';
     document.getElementById('cliente-info-contenedor').style.display = 'none';
     document.getElementById('cliente-seleccionado').textContent = 'No hay cliente seleccionado';
-    
+
     // Desabilitar sección de productos
     desabilitarSeccionProductos();
-    
+
     // Limpiar productos
     productosVenta = [];
     metodoPagoSeleccionado = null;
     mostrarProductosVenta();
     calcularResumen();
-    
+
     // Actualizar estado del botón finalizar
     actualizarEstadoBtnFinalizar();
 }
@@ -1884,13 +1913,13 @@ function abrirFormularioCrearClienteVenta(ci = '') {
     document.getElementById('modal-cliente').classList.add('active');
     document.getElementById('modal-cliente').style.display = 'flex';
     document.getElementById('modal-cliente-titulo').textContent = 'Registrar Nuevo Cliente';
-    
+
     // Pre-llenar C.I. si viene desde búsqueda
     document.getElementById('cli-ci').value = ci;
     document.getElementById('cli-nombre').value = '';
     document.getElementById('cli-apellido').value = '';
     document.getElementById('cli-correo').value = '';
-    
+
     const form = document.getElementById('form-cliente');
     form.onsubmit = null;
     form.removeEventListener('submit', form.onsubmit);
@@ -1928,7 +1957,7 @@ async function cargarClientes() {
  */
 function mostrarClientes(clientes) {
     const tbody = document.getElementById('clientes-lista');
-    
+
     if (!clientes || clientes.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay clientes registrados</td></tr>';
         return;
@@ -1966,13 +1995,13 @@ function abrirFormularioCliente() {
     document.getElementById('modal-cliente').classList.add('active');
     document.getElementById('modal-cliente').style.display = 'flex';
     document.getElementById('modal-cliente-titulo').textContent = 'Nuevo Cliente';
-    
+
     // Limpiar campos
     document.getElementById('cli-ci').value = '';
     document.getElementById('cli-nombre').value = '';
     document.getElementById('cli-apellido').value = '';
     document.getElementById('cli-correo').value = '';
-    
+
     // Asegurar que el handler es el correcto para crear
     const form = document.getElementById('form-cliente');
     form.onsubmit = null;
@@ -1986,7 +2015,7 @@ function abrirFormularioCliente() {
 function cerrarModalCliente() {
     document.getElementById('modal-cliente').classList.remove('active');
     document.getElementById('modal-cliente').style.display = 'none';
-    
+
     // Limpiar campos
     document.getElementById('form-cliente').reset();
 }
@@ -2073,7 +2102,7 @@ async function handleCrearClienteVenta(e) {
         }
 
         const data = await response.json();
-        
+
         // Seleccionar el cliente en la venta
         clienteSeleccionadoVenta = data.cliente;
         mostrarClienteSeleccionado(data.cliente);
@@ -2094,13 +2123,13 @@ function editarCliente(ci_nit, nombre, apellido, correo) {
     document.getElementById('modal-cliente').classList.add('active');
     document.getElementById('modal-cliente').style.display = 'flex';
     document.getElementById('modal-cliente-titulo').textContent = 'Editar Cliente';
-    
+
     document.getElementById('cli-ci').value = ci_nit;
     document.getElementById('cli-ci').disabled = true; // No permitir cambiar el C.I.
     document.getElementById('cli-nombre').value = nombre;
     document.getElementById('cli-apellido').value = apellido;
     document.getElementById('cli-correo').value = correo;
-    
+
     // Crear un nuevo form submit handler para edición
     const form = document.getElementById('form-cliente');
     const handleEdicion = async (e) => {
@@ -2111,7 +2140,7 @@ function editarCliente(ci_nit, nombre, apellido, correo) {
         // Restaurar el handler original para crear
         form.addEventListener('submit', handleCrearCliente);
     };
-    
+
     // Remover listeners anteriores
     form.removeEventListener('submit', handleCrearCliente);
     form.addEventListener('submit', handleEdicion);
@@ -2149,16 +2178,16 @@ async function handleActualizarCliente(ci_nit) {
         }
 
         mostrarAlerta('Cliente actualizado exitosamente', 'success');
-        
+
         // Restaurar handler original
         const form = document.getElementById('form-cliente');
         form.onsubmit = null;
         form.removeEventListener('submit', form.onsubmit);
         form.addEventListener('submit', handleCrearCliente);
-        
+
         // Re-habilitar C.I.
         document.getElementById('cli-ci').disabled = false;
-        
+
         cerrarModalCliente();
         cargarClientes();
     } catch (error) {
@@ -2206,12 +2235,12 @@ async function eliminarCliente(ci_nit) {
  */
 async function crearRespaldo() {
     const btnRespaldo = document.querySelector('[onclick="crearRespaldo()"]');
-    
+
     // Mostrar estado de carga
     const textoOriginal = btnRespaldo.textContent;
     btnRespaldo.disabled = true;
     btnRespaldo.textContent = '⏳ Creando copia de seguridad...';
-    
+
     try {
         const response = await fetch('http://localhost:3000/api/respaldo', {
             method: 'GET',
@@ -2230,12 +2259,12 @@ async function crearRespaldo() {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        
+
         // Nombre del archivo con fecha y hora
         const ahora = new Date();
         const fecha = ahora.toISOString().replace(/[:.]/g, '-').slice(0, -5);
         a.download = `kirkmark-backup-${fecha}.sql`;
-        
+
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -2243,11 +2272,11 @@ async function crearRespaldo() {
 
         // Mostrar mensaje de éxito
         mostrarAlerta('✓ Copia de seguridad creada exitosamente', 'success');
-        
+
         // Mostrar información del respaldo
         const respaldoInfo = document.getElementById('respaldo-info');
         const respaldoFecha = document.getElementById('respaldo-fecha');
-        
+
         respaldoFecha.textContent = `Última copia de seguridad: ${ahora.toLocaleString('es-BO')}`;
         respaldoInfo.style.display = 'block';
 
@@ -2400,11 +2429,11 @@ function respaldoAutomatico() {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${AuthService.getToken()}` }
             })
-            .then(resp => resp.json())
-            .then(data => {
-                if (data.success) console.log('[RESPALDO AUTOMÁTICO] Backup guardado en servidor');
-            })
-            .catch(err => console.error('[RESPALDO AUTOMÁTICO] Error:', err));
+                .then(resp => resp.json())
+                .then(data => {
+                    if (data.success) console.log('[RESPALDO AUTOMÁTICO] Backup guardado en servidor');
+                })
+                .catch(err => console.error('[RESPALDO AUTOMÁTICO] Error:', err));
         }
     }
 }
@@ -2419,11 +2448,11 @@ function registrarAccionDashboard(usuario, accion, detalle = '') {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario, accion, detalle })
     })
-    .then(res => res.json())
-    .then(data => {
-        if (!data.success) console.error('Error al enviar log:', data.error);
-    })
-    .catch(err => console.error('Error al conectar con servidor:', err));
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) console.error('Error al enviar log:', data.error);
+        })
+        .catch(err => console.error('Error al conectar con servidor:', err));
 }
 
 document.addEventListener('DOMContentLoaded', () => {

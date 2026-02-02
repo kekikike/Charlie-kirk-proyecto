@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <script src="services/auth.js"></script>
     <script src="dashboard.js"></script>
 </head>
+
 <body>
     <div class="dashboard-layout">
         <!-- Sidebar izquierdo -->
@@ -16,9 +18,11 @@
             <div class="sidebar-header">
                 <div class="logo-sidebar">
                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="25" y="30" width="50" height="40" rx="5" fill="#4169E1" stroke="#4169E1" stroke-width="2"/>
-                        <path d="M40 45 L50 55 L60 45" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <rect x="30" y="70" width="40" height="3" rx="1.5" fill="#4169E1"/>
+                        <rect x="25" y="30" width="50" height="40" rx="5" fill="#4169E1" stroke="#4169E1"
+                            stroke-width="2" />
+                        <path d="M40 45 L50 55 L60 45" fill="none" stroke="white" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <rect x="30" y="70" width="40" height="3" rx="1.5" fill="#4169E1" />
                     </svg>
                 </div>
                 <h2>KIRKMARK</h2>
@@ -32,9 +36,12 @@
                     <li><a href="#" class="nav-item" data-section="productos">📦 Productos</a></li>
                     <li><a href="#" class="nav-item" data-section="inventario">📊 Inventario</a></li>
                     <li><a href="#" class="nav-item" data-section="clientes">👥 Clientes</a></li>
-                    <li id="nav-empleados" style="display: none;"><a href="#" class="nav-item" data-section="empleados">👔 Empleados</a></li>
-                    <li id="nav-usuarios" style="display: none;"><a href="#" class="nav-item" data-section="usuarios">👥 Usuarios</a></li>
-                    <li id="nav-respaldo" style="display: none;"><a href="#" class="nav-item" data-section="respaldo">💾 Respaldo</a></li>
+                    <li id="nav-empleados" style="display: none;"><a href="#" class="nav-item"
+                            data-section="empleados">👔 Empleados</a></li>
+                    <li id="nav-usuarios" style="display: none;"><a href="#" class="nav-item" data-section="usuarios">👥
+                            Usuarios</a></li>
+                    <li id="nav-respaldo" style="display: none;"><a href="#" class="nav-item" data-section="respaldo">💾
+                            Respaldo</a></li>
                 </ul>
             </nav>
         </aside>
@@ -51,7 +58,8 @@
                 <div class="navbar-right">
                     <button class="navbar-icon">🔔</button>
                     <div class="navbar-user-info">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%234169E1'/%3E%3Ctext x='12' y='15' font-size='10' fill='white' text-anchor='middle'%3EAD%3C/text%3E%3C/svg%3E" alt="Avatar" class="user-avatar">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%234169E1'/%3E%3Ctext x='12' y='15' font-size='10' fill='white' text-anchor='middle'%3EAD%3C/text%3E%3C/svg%3E"
+                            alt="Avatar" class="user-avatar">
                         <div class="user-details">
                             <span class="user-name" id="usuario-nombre">Admin</span>
                             <span class="user-role" id="usuario-rol">Administrador</span>
@@ -74,29 +82,29 @@
                         <div class="dashboard-card">
                             <div class="card-icon">📊</div>
                             <h3>Resumen de Ventas</h3>
-                            <p class="card-value">Bs 0.00</p>
-                            <p class="card-label">Hoy</p>
+                            <p class="card-value" id="total-ventas">Bs 0.00</p>
+                            <p class="card-label">Total Histórico</p>
                         </div>
 
                         <div class="dashboard-card">
                             <div class="card-icon">📦</div>
                             <h3>Productos</h3>
-                            <p class="card-value">0</p>
+                            <p class="card-value" id="total-productos">0</p>
                             <p class="card-label">En inventario</p>
                         </div>
 
                         <div class="dashboard-card">
                             <div class="card-icon">👥</div>
                             <h3>Clientes</h3>
-                            <p class="card-value">0</p>
+                            <p class="card-value" id="total-clientes">0</p>
                             <p class="card-label">Registrados</p>
                         </div>
 
                         <div class="dashboard-card">
                             <div class="card-icon">📈</div>
                             <h3>Transacciones</h3>
-                            <p class="card-value">0</p>
-                            <p class="card-label">Este mes</p>
+                            <p class="card-value" id="total-transacciones">0</p>
+                            <p class="card-label">Total Realizadas</p>
                         </div>
                     </div>
                 </section>
@@ -116,21 +124,21 @@
                             <h2>1. Datos del Cliente * (Obligatorio)</h2>
                             <div class="cliente-busqueda">
                                 <div style="display: flex; gap: 8px;">
-                                    <input 
-                                        type="text" 
-                                        id="buscar-cliente-ci" 
-                                        placeholder="Ingrese C.I./NIT del cliente"
-                                        class="input-busqueda"
-                                        style="flex: 1;"
-                                    >
-                                    <button type="button" class="btn-primary" onclick="buscarClientePorCI()">Buscar</button>
+                                    <input type="text" id="buscar-cliente-ci" placeholder="Ingrese C.I./NIT del cliente"
+                                        class="input-busqueda" style="flex: 1;">
+                                    <button type="button" class="btn-primary"
+                                        onclick="buscarClientePorCI()">Buscar</button>
                                 </div>
                             </div>
-                            <div class="cliente-info" id="cliente-info-contenedor" style="margin-top: 12px; display: none;">
-                                <div style="background: #e8f5e9; padding: 12px; border-radius: 4px; border-left: 4px solid #4caf50;">
-                                    <p id="cliente-seleccionado" style="margin: 0; color: #2e7d32; font-weight: 500;">No hay cliente seleccionado</p>
+                            <div class="cliente-info" id="cliente-info-contenedor"
+                                style="margin-top: 12px; display: none;">
+                                <div
+                                    style="background: #e8f5e9; padding: 12px; border-radius: 4px; border-left: 4px solid #4caf50;">
+                                    <p id="cliente-seleccionado" style="margin: 0; color: #2e7d32; font-weight: 500;">No
+                                        hay cliente seleccionado</p>
                                 </div>
-                                <button type="button" class="btn-secondary" onclick="limpiarClienteVenta()" style="margin-top: 8px;">Cambiar Cliente</button>
+                                <button type="button" class="btn-secondary" onclick="limpiarClienteVenta()"
+                                    style="margin-top: 8px;">Cambiar Cliente</button>
                             </div>
                             <input type="hidden" id="cliente-seleccionado-id" value="">
                         </div>
@@ -139,17 +147,13 @@
                         <hr style="margin: 20px 0; border: none; border-top: 2px solid #e0e0e0;">
 
                         <!-- Búsqueda de productos -->
-                        <div class="busqueda-productos" id="seccion-productos" style="opacity: 0.5; pointer-events: none;">
+                        <div class="busqueda-productos" id="seccion-productos"
+                            style="opacity: 0.5; pointer-events: none;">
                             <h2>2. Productos</h2>
                             <div class="search-box">
-                                <input 
-                                    type="text" 
-                                    id="buscar-producto" 
+                                <input type="text" id="buscar-producto"
                                     placeholder="🔍 Escanear código de barras o escribir el nombre del producto..."
-                                    class="input-busqueda"
-                                    onkeyup="buscarProductos(this.value)"
-                                    disabled
-                                >
+                                    class="input-busqueda" onkeyup="buscarProductos(this.value)" disabled>
                             </div>
                             <div id="resultados-busqueda" class="resultados-busqueda" style="display: none;">
                                 <div id="lista-resultados"></div>
@@ -172,7 +176,10 @@
                                             </tr>
                                         </thead>
                                         <tbody id="productos-venta-lista">
-                                            <tr><td colspan="6" style="text-align: center; color: #999;">No hay productos seleccionados</td></tr>
+                                            <tr>
+                                                <td colspan="6" style="text-align: center; color: #999;">No hay
+                                                    productos seleccionados</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -180,7 +187,7 @@
 
                             <div class="resumen-venta">
                                 <h2>3. Resumen de Venta</h2>
-                                
+
                                 <div class="resumen-item">
                                     <span>Subtotal:</span>
                                     <span class="resumen-valor" id="subtotal">Bs. 0.00</span>
@@ -210,7 +217,8 @@
                                     <input type="hidden" id="metodo-pago-seleccionado" value="">
                                 </div>
 
-                                <button class="btn-finalizar-venta" onclick="finalizarVenta()" id="btn-finalizar" disabled title="Primero debe seleccionar un cliente">
+                                <button class="btn-finalizar-venta" onclick="finalizarVenta()" id="btn-finalizar"
+                                    disabled title="Primero debe seleccionar un cliente">
                                     ✓ Finalizar Venta
                                 </button>
                                 <button class="btn-cancel" onclick="cancelarVenta()">Cancelar</button>
@@ -219,17 +227,22 @@
                     </div>
 
                     <!-- Modal Pago con QR -->
-                    <div id="modal-qr" class="modal" style="display: none; position: fixed; z-index: 9999; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
-                        <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%; text-align: center;">
-                            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <div id="modal-qr" class="modal"
+                        style="display: none; position: fixed; z-index: 9999; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
+                        <div class="modal-content"
+                            style="background: white; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%; text-align: center;">
+                            <div class="modal-header"
+                                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                                 <h2 style="margin: 0;">Pago con QR</h2>
-                                <button class="btn-close" onclick="cerrarModalQR()" style="cursor: pointer; border: none; background: none; font-size: 24px;">×</button>
+                                <button class="btn-close" onclick="cerrarModalQR()"
+                                    style="cursor: pointer; border: none; background: none; font-size: 24px;">×</button>
                             </div>
-                            
+
                             <div class="modal-body" style="padding: 20px 0;">
                                 <div id="contenedor-qr">
                                     <p>Escanea el código con tu app bancaria</p>
-                                    <img src="./src/assets/qr.jpg" alt="QR de prueba" style="width: 200px; margin: 15px 0;">
+                                    <img src="./src/assets/qr.jpg" alt="QR de prueba"
+                                        style="width: 200px; margin: 15px 0;">
                                     <p style="color: #666; font-size: 0.9em;">Esperando confirmación del pago...</p>
                                 </div>
 
@@ -241,7 +254,8 @@
                             </div>
 
                             <div class="form-actions">
-                                <button type="button" class="btn-cancel" onclick="cerrarModalQR()" style="padding: 10px 20px; cursor: pointer;">Cerrar</button>
+                                <button type="button" class="btn-cancel" onclick="cerrarModalQR()"
+                                    style="padding: 10px 20px; cursor: pointer;">Cerrar</button>
                             </div>
                         </div>
                     </div>
@@ -253,7 +267,7 @@
                                 <h2>MÉTODO DE PAGO</h2>
                                 <button class="btn-close" onclick="cerrarModalTarjeta()">×</button>
                             </div>
-                            
+
                             <form id="form-pago-completo" onsubmit="procesarValidacion(event)">
                                 <div class="form-group">
                                     <label>Selecciona un método de pago</label>
@@ -266,7 +280,8 @@
                                 <div style="display: flex; gap: 20px;">
                                     <div class="form-group" style="flex: 2;">
                                         <label>Número de tarjeta</label>
-                                        <input type="text" id="num-tarjeta" placeholder="0000 0000 0000 0000" maxlength="16" required>
+                                        <input type="text" id="num-tarjeta" placeholder="0000 0000 0000 0000"
+                                            maxlength="16" required>
                                     </div>
                                     <div class="form-group" style="flex: 1;">
                                         <label>Fecha caducidad</label>
@@ -283,21 +298,29 @@
 
                                 <h3>INFORMACIÓN DE FACTURACIÓN</h3>
                                 <div style="display: flex; gap: 10px;">
-                                    <div class="form-group"><label>Nombre</label><input type="text" id="f-nombre" required></div>
-                                    <div class="form-group"><label>Apellidos</label><input type="text" id="f-apellido" required></div>
-                                </div>
-                                
-                                <div style="display: flex; gap: 10px;">
-                                    <div class="form-group" style="flex: 2;"><label>Dirección</label><input type="text" required></div>
-                                    <div class="form-group" style="flex: 1;"><label>Localidad</label><input type="text" value="La Paz"></div>
+                                    <div class="form-group"><label>Nombre</label><input type="text" id="f-nombre"
+                                            required></div>
+                                    <div class="form-group"><label>Apellidos</label><input type="text" id="f-apellido"
+                                            required></div>
                                 </div>
 
                                 <div style="display: flex; gap: 10px;">
-                                    <div class="form-group"><label>Teléfono</label><input type="tel" id="f-tel" placeholder="77751832" required></div>
-                                    <div class="form-group"><label>Código Postal</label><input type="text" id="f-cp" placeholder="0000"></div>
+                                    <div class="form-group" style="flex: 2;"><label>Dirección</label><input type="text"
+                                            required></div>
+                                    <div class="form-group" style="flex: 1;"><label>Localidad</label><input type="text"
+                                            value="La Paz"></div>
                                 </div>
 
-                                <div id="error-mensaje" style="color: #ff4d4d; margin-bottom: 10px; display: none; font-weight: bold;"></div>
+                                <div style="display: flex; gap: 10px;">
+                                    <div class="form-group"><label>Teléfono</label><input type="tel" id="f-tel"
+                                            placeholder="77751832" required></div>
+                                    <div class="form-group"><label>Código Postal</label><input type="text" id="f-cp"
+                                            placeholder="0000"></div>
+                                </div>
+
+                                <div id="error-mensaje"
+                                    style="color: #ff4d4d; margin-bottom: 10px; display: none; font-weight: bold;">
+                                </div>
 
                                 <div class="form-actions">
                                     <button type="submit" class="btn-primary" id="btn-procesar">Validar y Pagar</button>
@@ -336,24 +359,32 @@
                                     </tr>
                                 </thead>
                                 <tbody id="historial-ventas-lista">
-                                    <tr><td colspan="6" style="text-align: center;">Cargando historial...</td></tr>
+                                    <tr>
+                                        <td colspan="6" style="text-align: center;">Cargando historial...</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </section>
-                
+
                 <!-- MODAL HISTORIAL -->
-                <div id="modal-detalle-venta" class="modal" style="display: none; position: fixed; z-index: 10000; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
-                    <div style="background: white; padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto;">
-                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                <div id="modal-detalle-venta" class="modal"
+                    style="display: none; position: fixed; z-index: 10000; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center;">
+                    <div
+                        style="background: white; padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto;">
+                        <div
+                            style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                             <h2 style="margin:0;">Detalle de Venta #<span id="det-id"></span></h2>
-                            <button onclick="document.getElementById('modal-detalle-venta').style.display='none'" style="cursor:pointer; border:none; background:none; font-size:24px;">&times;</button>
+                            <button onclick="document.getElementById('modal-detalle-venta').style.display='none'"
+                                style="cursor:pointer; border:none; background:none; font-size:24px;">&times;</button>
                         </div>
                         <div id="det-contenido" style="margin-top: 15px; font-size: 14px; line-height: 1.6;">
-                            </div>
-                        <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; text-align: right;">
-                            <button onclick="document.getElementById('modal-detalle-venta').style.display='none'" style="padding: 8px 16px; cursor: pointer;">Cerrar</button>
+                        </div>
+                        <div
+                            style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; text-align: right;">
+                            <button onclick="document.getElementById('modal-detalle-venta').style.display='none'"
+                                style="padding: 8px 16px; cursor: pointer;">Cerrar</button>
                         </div>
                     </div>
                 </div>
@@ -369,7 +400,7 @@
                     </div>
                     <div class="section-content">
                         <button class="btn-primary" onclick="abrirFormularioProducto()">+ Nuevo Producto</button>
-                        
+
                         <div id="modal-producto" class="modal" style="display: none;">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -379,7 +410,8 @@
                                 <form id="form-producto" class="form-usuario">
                                     <div class="form-group">
                                         <label for="producto-nombre">Nombre del Producto *</label>
-                                        <input type="text" id="producto-nombre" placeholder="Ej. Coca-Cola 500ml" required>
+                                        <input type="text" id="producto-nombre" placeholder="Ej. Coca-Cola 500ml"
+                                            required>
                                     </div>
 
                                     <div class="form-group">
@@ -391,12 +423,14 @@
 
                                     <div class="form-group">
                                         <label for="producto-precio">Precio Unitario *</label>
-                                        <input type="number" id="producto-precio" placeholder="0.00" step="0.01" required>
+                                        <input type="number" id="producto-precio" placeholder="0.00" step="0.01"
+                                            required>
                                     </div>
 
                                     <div class="form-actions">
                                         <button type="submit" class="btn-primary">Guardar Producto</button>
-                                        <button type="button" class="btn-cancel" onclick="cerrarModalProducto()">Cancelar</button>
+                                        <button type="button" class="btn-cancel"
+                                            onclick="cerrarModalProducto()">Cancelar</button>
                                     </div>
                                 </form>
                             </div>
@@ -416,7 +450,9 @@
                                     </tr>
                                 </thead>
                                 <tbody id="productos-lista">
-                                    <tr><td colspan="7" style="text-align: center;">Cargando productos...</td></tr>
+                                    <tr>
+                                        <td colspan="7" style="text-align: center;">Cargando productos...</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -434,7 +470,7 @@
                     </div>
                     <div class="section-content">
                         <button class="btn-primary" onclick="abrirFormularioInventario()">+ Agregar Lote</button>
-                        
+
                         <div id="modal-inventario" class="modal" style="display: none;">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -451,7 +487,8 @@
 
                                     <div class="form-group">
                                         <label for="inventario-stock">Cantidad de Stock *</label>
-                                        <input type="number" id="inventario-stock" placeholder="Cantidad" min="1" required>
+                                        <input type="number" id="inventario-stock" placeholder="Cantidad" min="1"
+                                            required>
                                     </div>
 
                                     <div class="form-group">
@@ -466,7 +503,8 @@
 
                                     <div class="form-actions">
                                         <button type="submit" class="btn-primary">Agregar Lote</button>
-                                        <button type="button" class="btn-cancel" onclick="cerrarModalInventario()">Cancelar</button>
+                                        <button type="button" class="btn-cancel"
+                                            onclick="cerrarModalInventario()">Cancelar</button>
                                     </div>
                                 </form>
                             </div>
@@ -487,7 +525,9 @@
                                     </tr>
                                 </thead>
                                 <tbody id="inventario-lista">
-                                    <tr><td colspan="8" style="text-align: center;">Cargando inventario...</td></tr>
+                                    <tr>
+                                        <td colspan="8" style="text-align: center;">Cargando inventario...</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -505,7 +545,7 @@
                     </div>
                     <div class="section-content">
                         <button class="btn-primary" onclick="abrirFormularioCliente()">+ Nuevo Cliente</button>
-                        
+
                         <div id="modal-cliente" class="modal" style="display: none;">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -535,7 +575,8 @@
 
                                     <div class="form-actions">
                                         <button type="submit" class="btn-primary">Guardar Cliente</button>
-                                        <button type="button" class="btn-cancel" onclick="cerrarModalCliente()">Cancelar</button>
+                                        <button type="button" class="btn-cancel"
+                                            onclick="cerrarModalCliente()">Cancelar</button>
                                     </div>
                                 </form>
                             </div>
@@ -555,7 +596,9 @@
                                     </tr>
                                 </thead>
                                 <tbody id="clientes-lista">
-                                    <tr><td colspan="7" style="text-align: center;">Cargando clientes...</td></tr>
+                                    <tr>
+                                        <td colspan="7" style="text-align: center;">Cargando clientes...</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -573,7 +616,7 @@
                     </div>
                     <div class="section-content">
                         <button class="btn-primary" onclick="cambiarSeccion('usuarios')">+ Nuevo Empleado</button>
-                        
+
                         <div class="tabla-empleados" style="margin-top: 20px;">
                             <table class="tabla-data">
                                 <thead>
@@ -589,7 +632,9 @@
                                     </tr>
                                 </thead>
                                 <tbody id="empleados-lista">
-                                    <tr><td colspan="8" style="text-align: center;">Cargando empleados...</td></tr>
+                                    <tr>
+                                        <td colspan="8" style="text-align: center;">Cargando empleados...</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -609,7 +654,8 @@
                         <form id="form-usuario" class="form-usuario">
                             <div class="form-section">
                                 <h3>Información Personal</h3>
-                                <p class="form-subtitle">Complete los siguientes campos para registrar un nuevo usuario</p>
+                                <p class="form-subtitle">Complete los siguientes campos para registrar un nuevo usuario
+                                </p>
 
                                 <div class="form-row">
                                     <div class="form-group">
@@ -678,11 +724,13 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="contraseña">Contraseña *</label>
-                                        <input type="password" id="contraseña" placeholder="Mínimo 6 caracteres" required>
+                                        <input type="password" id="contraseña" placeholder="Mínimo 6 caracteres"
+                                            required>
                                     </div>
                                     <div class="form-group">
                                         <label for="confirmar-contraseña">Confirmar Contraseña *</label>
-                                        <input type="password" id="confirmar-contraseña" placeholder="Confirme la contraseña" required>
+                                        <input type="password" id="confirmar-contraseña"
+                                            placeholder="Confirme la contraseña" required>
                                     </div>
                                 </div>
                             </div>
@@ -706,39 +754,51 @@
                     </div>
                     <div class="section-content">
                         <div style="max-width: 600px;">
-                            <div style="background: #fff3e0; padding: 16px; border-radius: 4px; border-left: 4px solid #ff9800; margin-bottom: 20px;">
+                            <div
+                                style="background: #fff3e0; padding: 16px; border-radius: 4px; border-left: 4px solid #ff9800; margin-bottom: 20px;">
                                 <p style="margin: 0; color: #e65100;">
                                     <strong>⚠️ Información Importante:</strong><br>
                                     Esta función crea una copia de seguridad completa de la base de datos actual.
-                                    El archivo será descargado automáticamente como un archivo .sql que puedes guardar de forma segura.
+                                    El archivo será descargado automáticamente como un archivo .sql que puedes guardar
+                                    de forma segura.
                                 </p>
                             </div>
 
                             <h3>Crear Respaldo</h3>
-                            <p style="color: #666;">Haz clic en el botón para descargar una copia completa de la base de datos.</p>
-                            
-                            <button class="btn-primary" onclick="crearRespaldo()" style="font-size: 16px; padding: 12px 24px; margin-bottom: 20px;">
+                            <p style="color: #666;">Haz clic en el botón para descargar una copia completa de la base de
+                                datos.</p>
+
+                            <button class="btn-primary" onclick="crearRespaldo()"
+                                style="font-size: 16px; padding: 12px 24px; margin-bottom: 20px;">
                                 💾 Crear Copia de Seguridad
                             </button>
 
-                            <div id="respaldo-info" style="display: none; background: #e8f5e9; padding: 16px; border-radius: 4px; margin-top: 20px;">
-                                <p style="margin: 0; color: #2e7d32;"><strong>✓ Respaldo creado exitosamente</strong></p>
+                            <div id="respaldo-info"
+                                style="display: none; background: #e8f5e9; padding: 16px; border-radius: 4px; margin-top: 20px;">
+                                <p style="margin: 0; color: #2e7d32;"><strong>✓ Respaldo creado exitosamente</strong>
+                                </p>
                                 <p id="respaldo-fecha" style="margin: 8px 0 0 0; color: #558b2f; font-size: 14px;"></p>
                             </div>
 
                             <h3 style="margin-top: 40px;">Historial de Respaldos</h3>
-                            <p style="color: #666;">Los respaldos se descargan automáticamente a tu carpeta de descargas.</p>
+                            <p style="color: #666;">Los respaldos se descargan automáticamente a tu carpeta de
+                                descargas.</p>
                             <div style="margin-top: 16px;">
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
-                                    <button class="btn-secondary" id="btn-listar-respaldos" onclick="listarRespaldos()">🔄 Listar respaldos</button>
-                                    <span style="color:#666; font-size:0.95em">Selecciona un respaldo y presiona Restaurar</span>
+                                    <button class="btn-secondary" id="btn-listar-respaldos"
+                                        onclick="listarRespaldos()">🔄 Listar respaldos</button>
+                                    <span style="color:#666; font-size:0.95em">Selecciona un respaldo y presiona
+                                        Restaurar</span>
                                 </div>
 
                                 <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
-                                    <select id="backup-select" style="flex:1; padding:8px; border-radius:4px; border:1px solid #ddd;">
+                                    <select id="backup-select"
+                                        style="flex:1; padding:8px; border-radius:4px; border:1px solid #ddd;">
                                         <option value="">-- Seleccione un respaldo --</option>
                                     </select>
-                                    <button class="btn-primary" id="btn-restaurar" onclick="restaurarRespaldoSeleccionado()" style="padding:10px 16px;">⚠️ Restaurar</button>
+                                    <button class="btn-primary" id="btn-restaurar"
+                                        onclick="restaurarRespaldoSeleccionado()" style="padding:10px 16px;">⚠️
+                                        Restaurar</button>
                                 </div>
 
                                 <div id="respaldo-listado-info" style="color:#666; font-size:0.9em;"></div>
@@ -753,4 +813,5 @@
     <!-- Mensajes de alerta -->
     <div id="alert" class="alert"></div>
 </body>
+
 </html>

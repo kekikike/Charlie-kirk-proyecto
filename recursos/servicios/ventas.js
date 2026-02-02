@@ -21,13 +21,13 @@ const crearVenta = (datos, callback) => {
     // - ciempleado_enc (encriptado - para mostrar)
     const queryVenta = `
         INSERT INTO tventas
-        (ci_nit_enc, ciempleado, ciempleado_enc, subtotal, total, idmetodo, fechaventa, hora, fecharegistro, estado, usuarioA)
-        VALUES (?, ?, ?, ?, ?, ?, CURDATE(), CURTIME(), NOW(), 1, ?)
+        (ci_nit_enc, ciempleado, ciempleado_enc, subtotal, total, idmetodo, ci_nit, fechaventa, hora, fecharegistro, estado, usuarioA)
+        VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), CURTIME(), NOW(), 1, ?)
     `;
 
     db.query(
         queryVenta,
-        [ci_nit_enc, ciempleado, ciempleado_enc, subtotal, total, idmetodo, ciempleado],
+        [ci_nit_enc, ciempleado, ciempleado_enc, subtotal, total, idmetodo, ci_nit ? parseInt(ci_nit) : null, ciempleado],
         (err, result) => {
             if (err) return callback(err);
 
@@ -143,7 +143,7 @@ const obtenerVentas = (callback) => {
             te.apellido1,
             tc.nombre as cliente_nombre,
             tc.apellido as cliente_apellido,
-            COUNT(tdv.iddetalle) AS cantidad_productos
+            COALESCE(SUM(tdv.cantidad), 0) AS cantidad_productos
         FROM tventas tv
         LEFT JOIN tmetodopago tm ON tv.idmetodo = tm.idmetodo
         LEFT JOIN templeados te ON tv.ciempleado = te.ciempleado
@@ -185,11 +185,11 @@ const obtenerVentasConAcceso = (ciempleado, rol, callback) => {
             tc.nombre as cliente_nombre,
             tc.apellido as cliente_apellido,
             tc.ci_nit as cliente_ci,
-            COUNT(tdv.iddetalle) AS cantidad_productos
+            COALESCE(SUM(tdv.cantidad), 0) AS cantidad_productos
         FROM tventas tv
         LEFT JOIN tmetodopago tm ON tv.idmetodo = tm.idmetodo
         LEFT JOIN templeados te ON tv.ciempleado = te.ciempleado
-        LEFT JOIN tclientes tc ON tv.ci_nit_enc IS NOT NULL
+        LEFT JOIN tclientes tc ON tv.ci_nit = tc.ci_nit
         LEFT JOIN tdetalleventa tdv ON tv.idventa = tdv.idventa
         GROUP BY tv.idventa
         ORDER BY tv.fecharegistro DESC
@@ -197,7 +197,7 @@ const obtenerVentasConAcceso = (ciempleado, rol, callback) => {
 
     db.query(query, (err, rows) => {
         if (err) return callback(err);
-        
+
         // Si es administrador, retorna todo sin ocultar
         if (rol === 1) {
             // Desencriptar solo ci_nit_enc para admin
@@ -207,7 +207,7 @@ const obtenerVentasConAcceso = (ciempleado, rol, callback) => {
             }));
             return callback(null, ventasDesencriptadas || []);
         }
-        
+
         // Si es vendedor, aplicar restricciones
         const ventasControl = rows.map(venta => {
             // Si la venta es de este vendedor, mostrar completo
@@ -233,7 +233,7 @@ const obtenerVentasConAcceso = (ciempleado, rol, callback) => {
                 };
             }
         });
-        
+
         callback(null, ventasControl || []);
     });
 };
@@ -278,10 +278,46 @@ const obtenerMetodosPago = (callback) => {
     });
 };
 
+/**
+ * Obtiene estadísticas generales para el dashboard
+ */
+const obtenerEstadisticas = (callback) => {
+    const queries = {
+        ventas: "SELECT COALESCE(SUM(total), 0) as total_ventas, COUNT(*) as cantidad_ventas FROM tventas WHERE estado = 1",
+        productos: "SELECT COUNT(*) as total_productos FROM tproductos WHERE estado = 1",
+        clientes: "SELECT COUNT(*) as total_clientes FROM tclientes WHERE estado = 1",
+        empleados: "SELECT COUNT(*) as total_empleados FROM templeados WHERE estado = 1"
+    };
+
+    db.query(queries.ventas, (err, ventasRes) => {
+        if (err) return callback(err);
+
+        db.query(queries.productos, (err, prodRes) => {
+            if (err) return callback(err);
+
+            db.query(queries.clientes, (err, cliRes) => {
+                if (err) return callback(err);
+
+                db.query(queries.empleados, (err, empRes) => {
+                    if (err) return callback(err);
+
+                    callback(null, {
+                        ventas: ventasRes[0],
+                        productos: prodRes[0].total_productos,
+                        clientes: cliRes[0].total_clientes,
+                        empleados: empRes[0].total_empleados
+                    });
+                });
+            });
+        });
+    });
+};
+
 module.exports = {
     crearVenta,
     obtenerVentas,
     obtenerVentasConAcceso,
     obtenerDetallesVenta,
-    obtenerMetodosPago
+    obtenerMetodosPago,
+    obtenerEstadisticas
 };

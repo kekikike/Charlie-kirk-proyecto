@@ -16,8 +16,8 @@ const crearVenta = (req, res) => {
 
     // Validaciones
     if (!subtotal || !total || !idmetodo || !detalles || detalles.length === 0) {
-        return res.status(400).json({ 
-            mensaje: 'Por favor proporciona: subtotal, total, idmetodo y detalles' 
+        return res.status(400).json({
+            mensaje: 'Por favor proporciona: subtotal, total, idmetodo y detalles'
         });
     }
 
@@ -44,7 +44,7 @@ const crearVenta = (req, res) => {
         }
 
         console.log('[VENTA] Venta creada exitosamente:', resultado);
-        res.status(201).json({ 
+        res.status(201).json({
             mensaje: 'Venta registrada exitosamente',
             venta: resultado
         });
@@ -59,17 +59,17 @@ const crearVenta = (req, res) => {
  */
 const obtenerVentas = (req, res) => {
     const { ciempleado, rol } = req.usuario;
-    
+
     // Usar el nuevo servicio con control de acceso
     servicios.obtenerVentasConAcceso(ciempleado, rol, (err, ventas) => {
         if (err) {
             console.error('[HISTORIAL] Error:', err.message);
             return res.status(500).json({ error: err.message });
         }
-        
-        res.json({ 
+
+        res.json({
             mensaje: 'Ventas obtenidas exitosamente',
-            ventas 
+            ventas
         });
     });
 };
@@ -82,8 +82,8 @@ const obtenerDetallesVenta = (req, res) => {
 
     servicios.obtenerDetallesVenta(idventa, (err, detalles) => {
         if (err) return res.status(500).json({ error: err.message });
-        
-        res.json({ 
+
+        res.json({
             mensaje: 'Detalles obtenidos exitosamente',
             detalles
         });
@@ -96,10 +96,10 @@ const obtenerDetallesVenta = (req, res) => {
 const obtenerMetodosPago = (req, res) => {
     servicios.obtenerMetodosPago((err, metodos) => {
         if (err) return res.status(500).json({ error: err.message });
-        
-        res.json({ 
+
+        res.json({
             mensaje: 'Métodos de pago obtenidos exitosamente',
-            metodos 
+            metodos
         });
     });
 };
@@ -138,7 +138,7 @@ const generarTicket = (req, res) => {
 // Ejemplo de cómo debe estar tu consulta en el controlador
 const obtenerVentaPorId = (req, res) => {
     const { id } = req.params;
-    
+
     // Consulta para obtener la venta y sus productos
     const sql = `
         SELECT dv.cantidad, dv.preciounitario, dv.subtotal, p.nombre as nombre_producto
@@ -148,16 +148,24 @@ const obtenerVentaPorId = (req, res) => {
 
     db.query(sql, [id], (err, detalles) => {
         if (err) return res.status(500).json({ error: err.message });
-        
+
         // Aquí devuelves los detalles junto con lo que ya tenías
-        res.json({ detalles }); 
+        res.json({ detalles });
     });
 };
+const obtenerEstadisticasDashboard = (req, res) => {
+    servicios.obtenerEstadisticas((err, stats) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ stats });
+    });
+};
+
 module.exports = {
     crearVenta,
     obtenerVentas,
     obtenerDetallesVenta,
     obtenerMetodosPago,
-    generarTicket, // <--- Nueva
-    obtenerVentaPorId // <--- Nueva
+    generarTicket,
+    obtenerVentaPorId,
+    obtenerEstadisticasDashboard
 };
