@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
     configurarNavegacion();
     configurarFormulario();
     cargarDatos();
+    cargarCategorias();
+    configurarFiltroProductos();
 });
 
 /**
@@ -693,7 +695,22 @@ async function cargarProductos() {
         const token = AuthService.getToken();
         console.log('[CARGAR PRODUCTOS] Token:', token ? 'Presente' : 'Ausente');
 
-        const response = await fetch('http://localhost:3000/api/productos', {
+        // Construir URL con posible filtro por categoría
+        const selectFiltro = document.getElementById('filtro-categoria');
+        const inputBuscar = document.getElementById('buscar-productos-global');
+        let url = 'http://localhost:3000/api/productos';
+        const params = [];
+        
+        if (selectFiltro) {
+            console.log('[CARGAR PRODUCTOS] Valor del select:', selectFiltro.value);
+            if (selectFiltro.value) params.push(`idcategoria=${encodeURIComponent(selectFiltro.value)}`);
+        }
+        
+        if (params.length) url += `?${params.join('&')}`;
+        
+        console.log('[CARGAR PRODUCTOS] URL final:', url);
+
+        const response = await fetch(url, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -707,8 +724,18 @@ async function cargarProductos() {
 
         const data = await response.json();
         console.log('[CARGAR PRODUCTOS] Datos recibidos:', data);
-        console.log('[CARGAR PRODUCTOS] Productos:', data.productos);
-        mostrarProductos(data.productos);
+        let productos = data.productos || [];
+
+        // Filtrar por texto de búsqueda (cliente)
+        const q = (document.getElementById('buscar-productos-global')?.value || '').trim().toLowerCase();
+        if (q) {
+            productos = productos.filter(p => {
+                return (p.nombre || '').toLowerCase().includes(q) || (p.codproducto || '').toLowerCase().includes(q);
+            });
+        }
+
+        console.log('[CARGAR PRODUCTOS] Productos después de filtro:', productos.length);
+        mostrarProductos(productos);
     } catch (error) {
         console.error('Error cargando productos:', error);
         mostrarAlerta('Error al cargar productos', 'error');
@@ -723,18 +750,68 @@ async function cargarCategorias() {
         const response = await fetch('http://localhost:3000/api/productos/categorias');
         const data = await response.json();
 
-        const selectCategoria = document.getElementById('producto-categoria');
-        selectCategoria.innerHTML = '<option value="">Seleccione una categoría</option>';
+        const selectProductoCategoria = document.getElementById('producto-categoria');
+        const selectFiltro = document.getElementById('filtro-categoria');
+
+        if (selectProductoCategoria) {
+            selectProductoCategoria.innerHTML = '<option value="">Seleccione una categoría</option>';
+        }
+
+        if (selectFiltro) {
+            selectFiltro.innerHTML = '<option value="">Todas las categorías</option>';
+        }
 
         data.categorias.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat.idcategoria;
-            option.textContent = cat.nombre;
-            selectCategoria.appendChild(option);
+            if (selectProductoCategoria) {
+                const option = document.createElement('option');
+                option.value = cat.idcategoria;
+                option.textContent = cat.nombre;
+                selectProductoCategoria.appendChild(option);
+            }
+            if (selectFiltro) {
+                const optionF = document.createElement('option');
+                optionF.value = cat.idcategoria;
+                optionF.textContent = cat.nombre;
+                selectFiltro.appendChild(optionF);
+            }
         });
     } catch (error) {
         console.error('Error cargando categorías:', error);
     }
+}
+
+/**
+ * Configura los listeners para el filtro de productos
+ */
+function configurarFiltroProductos() {
+    const selectFiltro = document.getElementById('filtro-categoria');
+    const inputBuscar = document.getElementById('buscar-productos-global');
+
+    // Listener para el select de categorías
+    if (selectFiltro) {
+        selectFiltro.addEventListener('change', function() {
+            console.log('[FILTRO] Categoría seleccionada:', this.value);
+            cargarProductos();
+        });
+    }
+
+    // Listener para la búsqueda de productos (con debounce)
+    if (inputBuscar) {
+        let debounceTimeout = null;
+        inputBuscar.addEventListener('input', function() {
+            console.log('[FILTRO] Búsqueda:', this.value);
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => cargarProductos(), 300);
+        });
+    }
+}
+
+function limpiarFiltroProductos() {
+    const selectFiltro = document.getElementById('filtro-categoria');
+    const inputBuscar = document.getElementById('buscar-productos-global');
+    if (selectFiltro) selectFiltro.value = '';
+    if (inputBuscar) inputBuscar.value = '';
+    cargarProductos();
 }
 
 /**

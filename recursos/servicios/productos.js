@@ -21,7 +21,24 @@ const obtenerCategorias = (callback) => {
  * Obtiene lista de todos los productos
  * @param {Function} callback - Callback(err, productos)
  */
-const obtenerProductos = (callback) => {
+const obtenerProductos = (idcategoria, callback) => {
+    // Permitir que el primer argumento sea el callback (compatibilidad)
+    if (typeof idcategoria === 'function') {
+        callback = idcategoria;
+        idcategoria = null;
+    }
+
+    let params = [];
+    let where = '';
+    // Validar que idcategoria sea un número válido, no vacío ni null
+    if (idcategoria && idcategoria !== 'undefined' && idcategoria !== '') {
+        const catId = parseInt(idcategoria);
+        if (!isNaN(catId)) {
+            where = 'WHERE tp.idcategoria = ?';
+            params.push(catId);
+        }
+    }
+
     const query = `
         SELECT 
             tp.codproducto, tp.nombre, tp.preciounitario, 
@@ -31,16 +48,18 @@ const obtenerProductos = (callback) => {
         FROM tproductos tp
         LEFT JOIN tcategorias tc ON tp.idcategoria = tc.idcategoria
         LEFT JOIN tinventario ti ON tp.codproducto = ti.codproducto
+        ${where}
         GROUP BY tp.codproducto, tp.nombre, tp.preciounitario, tp.estado, tc.idcategoria, tc.nombre
         ORDER BY tp.nombre ASC
     `;
-    
-    db.query(query, (err, results) => {
+
+    console.log('[SERVICIO PRODUCTOS] Ejecutando query con params:', params, 'where:', where);
+    db.query(query, params, (err, results) => {
         if (err) {
             console.error('[OBTENER PRODUCTOS] Error:', err.message);
             return callback(err, null);
         }
-        console.log('[OBTENER PRODUCTOS] Resultados:', JSON.stringify(results, null, 2));
+        console.log('[OBTENER PRODUCTOS] Resultados (filtro idcategoria=' + (idcategoria || 'todos') + '):', JSON.stringify(results, null, 2));
         callback(null, results || []);
     });
 };

@@ -5,7 +5,10 @@ const { verificarToken } = require('../middleware/autenticacion.js');
 
 // Rutas públicas
 router.get('/categorias', obtenerCategorias);
-router.get('/', obtenerProductos);
+router.get('/', (req, res, next) => {
+    console.log('[RUTA PRODUCTOS GET] Solicitud recibida, query:', req.query);
+    obtenerProductos(req, res);
+});
 
 // Rutas protegidas
 router.post('/', verificarToken, crearProducto);

@@ -21,9 +21,14 @@ const obtenerCategorias = (req, res) => {
 
 
 const obtenerProductos = (req, res) => {
-    servicios.obtenerProductos((err, productos) => {
+    const { idcategoria } = req.query;
+    console.log('[CONTROLADOR PRODUCTOS] Query params:', req.query);
+    console.log('[CONTROLADOR PRODUCTOS] idcategoria recibido:', idcategoria, 'tipo:', typeof idcategoria);
+
+    servicios.obtenerProductos(idcategoria, (err, productos) => {
         if (err) return res.status(500).json({ error: err.message });
-        
+
+        console.log('[CONTROLADOR PRODUCTOS] Productos retornados:', productos.length);
         res.json({ 
             mensaje: 'Productos obtenidos exitosamente',
             productos 

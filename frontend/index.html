@@ -399,7 +399,16 @@
                         <button class="btn-back" onclick="volverAtras()">← Volver</button>
                     </div>
                     <div class="section-content">
-                        <button class="btn-primary" onclick="abrirFormularioProducto()">+ Nuevo Producto</button>
+                        <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+                            <button class="btn-primary" onclick="abrirFormularioProducto()">+ Nuevo Producto</button>
+                            <div style="display:flex; gap:8px; align-items:center; margin-left: 8px;">
+                                <select id="filtro-categoria" style="padding:8px; border-radius:4px; border:1px solid #ddd;">
+                                    <option value="">Todas las categorías</option>
+                                </select>
+                                <input id="buscar-productos-global" type="search" placeholder="🔍 Buscar por nombre o código..." class="input-busqueda" style="padding:8px; border-radius:4px; border:1px solid #ddd; width: 320px;">
+                                <button class="btn-secondary" id="btn-limpiar-filtro" onclick="limpiarFiltroProductos()">Limpiar</button>
+                            </div>
+                        </div>
 
                         <div id="modal-producto" class="modal" style="display: none;">
                             <div class="modal-content">
