@@ -14,6 +14,8 @@ const AuthService = {
      */
     async login(correo, contraseña) {
         try {
+            Logger.agregar('AuthService', `Enviando login para: ${correo}`, 'info');
+            
             const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: {
@@ -27,16 +29,31 @@ const AuthService = {
 
             const data = await response.json();
 
+            Logger.agregar('AuthService', `Respuesta del servidor: ${response.status}`, 'info');
+
             if (!response.ok) {
+                Logger.agregar('AuthService', `Error en login: ${JSON.stringify(data)}`, 'error');
                 throw new Error(data.mensaje || 'Error en el login');
             }
 
+            if (!data.token) {
+                Logger.agregar('AuthService', 'No se recibió token', 'error');
+                throw new Error('No se recibió token de autenticación');
+            }
+
+            Logger.agregar('AuthService', 'Token recibido, guardando...', 'info');
+            
             // Guardar datos en localStorage
             localStorage.setItem('token', data.token);
             localStorage.setItem('usuario', JSON.stringify(data.usuario));
 
+            Logger.agregar('AuthService', 'Datos guardados en localStorage', 'info');
+            Logger.agregar('AuthService', `Token: ${data.token.substring(0, 30)}...`, 'info');
+            Logger.agregar('AuthService', `Usuario: ${data.usuario.nombre1}`, 'info');
+
             return { success: true, data };
         } catch (error) {
+            Logger.agregar('AuthService', `Error en login: ${error.message}`, 'error');
             return { success: false, error: error.message };
         }
     },
@@ -50,8 +67,11 @@ const AuthService = {
             const token = this.getToken();
 
             if (!token) {
+                Logger.agregar('AUTH', 'No hay token disponible', 'warn');
                 throw new Error('No hay sesión activa');
             }
+
+            Logger.agregar('AUTH', `Obteniendo perfil con token: ${token.substring(0, 20)}...`, 'info');
 
             const response = await fetch(`${API_URL}/perfil`, {
                 method: 'GET',
@@ -63,12 +83,22 @@ const AuthService = {
 
             const data = await response.json();
 
+            Logger.agregar('AUTH', `Respuesta del servidor: ${response.status}`, 'info');
+
             if (!response.ok) {
-                throw new Error(data.mensaje || 'Error al cargar perfil');
+                Logger.agregar('AUTH', `Error en respuesta: ${JSON.stringify(data)}`, 'error');
+                throw new Error(data.mensaje || data.error || 'Error al cargar perfil');
             }
 
+            if (!data.usuario) {
+                Logger.agregar('AUTH', 'No se encontró usuario en respuesta', 'error');
+                throw new Error('Respuesta inválida del servidor');
+            }
+
+            Logger.agregar('AUTH', `Perfil cargado exitosamente: ${data.usuario.nombre1}`, 'info');
             return { success: true, data: data.usuario };
         } catch (error) {
+            Logger.agregar('AUTH', `Error en obtenerPerfil: ${error.message}`, 'error');
             return { success: false, error: error.message };
         }
     },
@@ -112,7 +142,9 @@ const AuthService = {
      * @returns {string|null} Token JWT
      */
     getToken() {
-        return localStorage.getItem('token');
+        const token = localStorage.getItem('token');
+        console.log('[AuthService] getToken() retorna:', token ? 'SÍ (token presente)' : 'NO (sin token)');
+        return token;
     },
 
     /**
@@ -129,7 +161,10 @@ const AuthService = {
      * @returns {boolean}
      */
     estaAutenticado() {
-        return !!this.getToken();
+        const token = this.getToken();
+        const autenticado = !!token;
+        Logger.agregar('AuthService', `estaAutenticado() retorna: ${autenticado}`, 'info');
+        return autenticado;
     },
 
     /**

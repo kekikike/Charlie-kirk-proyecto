@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const db = require('../config/conexion.js');
+const { encriptarDato, desencriptarDato, ocultarDato } = require('./encriptacion.js');
 
 /* =========================
    CONFIG CIFRADO
@@ -54,12 +55,14 @@ function descifrar(texto) {
    ========================= */
 
 const crearCliente = (datos, callback) => {
-    const { ci_nit, nombre, apellido, correo, usuarioA } = datos;
+    const { ci_nit, nombre, apellido, correo, telefono, usuarioA } = datos;
+
+    // Encriptar datos sensibles
+    const telefono_enc = telefono ? encriptarDato(telefono) : null;
 
     const query = `
-        INSERT INTO tclientes
-        (ci_nit, nombre, apellido, correo, estado, usuarioA)
-        VALUES (?, ?, ?, ?, 1, ?)
+        INSERT INTO tclientes (ci_nit, nombre, apellido, correo, telefono_enc, estado, usuarioA)
+        VALUES (?, ?, ?, ?, ?, 1, ?)
     `;
 
     db.query(
@@ -69,11 +72,24 @@ const crearCliente = (datos, callback) => {
             cifrar(nombre),
             cifrar(apellido),
             cifrar(correo),
+            telefono_enc,
             usuarioA
         ],
-        (err) => {
-            if (err) return callback(err, null);
-            callback(null, { ci_nit });
+        (err, result) => {
+            if (err) {
+                console.error('[CLIENTES] Error al insertar:', err.message);
+                return callback(err, null);
+            }
+
+            // Retornar los datos del cliente creado
+            callback(null, {
+                ci_nit,
+                nombre,
+                apellido,
+                correo,
+                telefono: telefono || null,
+                estado: 1
+            });
         }
     );
 };
@@ -84,19 +100,30 @@ const crearCliente = (datos, callback) => {
 
 const obtenerClientes = (callback) => {
     const query = `
-        SELECT ci_nit, nombre, apellido, correo, fecharegistro, estado
+        SELECT 
+            ci_nit,
+            nombre,
+            apellido,
+            correo,
+            telefono_enc,
+            fecharegistro,
+            estado
         FROM tclientes
         WHERE estado = 1
     `;
 
     db.query(query, (err, results) => {
-        if (err) return callback(err, null);
+        if (err) {
+            console.error('[CLIENTES] Error al obtener:', err.message);
+            return callback(err, null);
+        }
 
         const clientes = results.map(c => ({
             ci_nit: c.ci_nit,
             nombre: descifrar(c.nombre),
             apellido: descifrar(c.apellido),
             correo: descifrar(c.correo),
+            telefono: c.telefono_enc ? desencriptarDato(c.telefono_enc) : null,
             fecharegistro: c.fecharegistro,
             estado: c.estado
         }));
@@ -111,25 +138,40 @@ const obtenerClientes = (callback) => {
 
 const obtenerClientePorId = (ci_nit, callback) => {
     const query = `
-        SELECT *
+        SELECT 
+            ci_nit,
+            nombre,
+            apellido,
+            correo,
+            telefono_enc,
+            fecharegistro,
+            estado
         FROM tclientes
         WHERE ci_nit = ? AND estado = 1
     `;
 
     db.query(query, [ci_nit], (err, results) => {
-        if (err) return callback(err, null);
-        if (!results.length) return callback(null, null);
+        if (err) {
+            console.error('[CLIENTES] Error al obtener por ID:', err.message);
+            return callback(err, null);
+        }
+
+        if (!results.length) {
+            return callback(null, null);
+        }
 
         const c = results[0];
-
-        callback(null, {
+        const clienteDesencriptado = {
             ci_nit: c.ci_nit,
             nombre: descifrar(c.nombre),
             apellido: descifrar(c.apellido),
             correo: descifrar(c.correo),
+            telefono: c.telefono_enc ? desencriptarDato(c.telefono_enc) : null,
             fecharegistro: c.fecharegistro,
             estado: c.estado
-        });
+        };
+
+        callback(null, clienteDesencriptado);
     });
 };
 
@@ -156,6 +198,11 @@ const actualizarCliente = (ci_nit, datos, callback) => {
         valores.push(cifrar(datos.correo));
     }
 
+    if (datos.telefono) {
+        campos.push('telefono_enc = ?');
+        valores.push(encriptarDato(datos.telefono));
+    }
+
     if (!campos.length) {
         return callback(new Error('Nada para actualizar'), null);
     }
@@ -169,7 +216,10 @@ const actualizarCliente = (ci_nit, datos, callback) => {
     `;
 
     db.query(query, valores, (err) => {
-        if (err) return callback(err, null);
+        if (err) {
+            console.error('[CLIENTES] Error al actualizar:', err.message);
+            return callback(err, null);
+        }
         callback(null, { ci_nit });
     });
 };

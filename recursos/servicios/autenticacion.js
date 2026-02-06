@@ -5,6 +5,7 @@
 
 const bcrypt = require('bcryptjs');
 const db = require('../config/conexion.js');
+const { encriptarDato, desencriptarDato, ocultarDato } = require('./encriptacion.js');
 
 /**
  * Valida si un usuario es administrador
@@ -94,13 +95,18 @@ const compararContraseña = (contraseña, hash, callback) => {
 const crearEmpleado = (datos, callback) => {
     const { ciempleado, nombre1, nombre2, apellido1, apellido2, fechanac, sexo, correo, contraseña, telefono, rol, usuarioA } = datos;
 
+    // Encriptar datos sensibles
+    const correo_enc = encriptarDato(correo);
+    const telefono_enc = encriptarDato(telefono);
+
+    // IMPORTANTE: NO guardamos correo y telefono sin encriptar, SOLO los encriptados
     const query = `
         INSERT INTO templeados 
-        (ciempleado, nombre1, nombre2, apellido1, apellido2, fechanac, sexo, correo, contraseña, telefono, rol, estado, usuarioA) 
+        (ciempleado, nombre1, nombre2, apellido1, apellido2, fechanac, sexo, correo_enc, contraseña, telefono_enc, rol, estado, usuarioA) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
     `;
 
-    db.query(query, [ciempleado, nombre1, nombre2 || null, apellido1, apellido2 || null, fechanac, sexo, correo, contraseña, telefono, rol, usuarioA], 
+    db.query(query, [ciempleado, nombre1, nombre2 || null, apellido1, apellido2 || null, fechanac, sexo, correo_enc, contraseña, telefono_enc, rol, usuarioA], 
         (err, results) => {
             if (err) return callback(err, null);
             callback(null, { ciempleado, nombre1, apellido1, correo });
@@ -117,7 +123,7 @@ const obtenerPerfilCompleto = (ciempleado, callback) => {
     const query = `
         SELECT 
             em.ciempleado, em.nombre1, em.nombre2, em.apellido1, em.apellido2, 
-            em.correo, em.telefono, em.fecharegistro, em.rol,
+            em.correo_enc, em.telefono_enc, em.fecharegistro, em.rol,
             tr.nombre as rolNombre
         FROM templeados em
         LEFT JOIN troles tr ON em.rol = tr.idrol
@@ -126,8 +132,17 @@ const obtenerPerfilCompleto = (ciempleado, callback) => {
 
     db.query(query, [ciempleado], (err, results) => {
         if (err) return callback(err, null);
-        const perfil = results.length > 0 ? results[0] : null;
-        callback(null, perfil);
+        if (results.length === 0) return callback(null, null);
+        
+        const perfil = results[0];
+        // Desencriptar datos sensibles
+        const perfilDesencriptado = {
+            ...perfil,
+            correo: perfil.correo_enc ? desencriptarDato(perfil.correo_enc) : null,
+            telefono: perfil.telefono_enc ? desencriptarDato(perfil.telefono_enc) : null
+        };
+        
+        callback(null, perfilDesencriptado);
     });
 };
 
@@ -139,7 +154,7 @@ const obtenerListaEmpleados = (callback) => {
     const query = `
         SELECT 
             em.ciempleado, em.nombre1, em.nombre2, em.apellido1, em.apellido2, 
-            em.correo, em.telefono, em.rol, em.estado,
+            em.correo_enc, em.telefono_enc, em.rol, em.estado,
             tr.nombre as rolNombre
         FROM templeados em
         LEFT JOIN troles tr ON em.rol = tr.idrol
@@ -148,9 +163,17 @@ const obtenerListaEmpleados = (callback) => {
 
     db.query(query, (err, results) => {
         if (err) return callback(err, null);
-        callback(null, results || []);
+        
+        // Desencriptar datos sensibles
+        const empleadosDesencriptados = results.map(emp => ({
+            ...emp,
+            correo: emp.correo_enc ? desencriptarDato(emp.correo_enc) : null,
+            telefono: emp.telefono_enc ? desencriptarDato(emp.telefono_enc) : null
+        }));
+        
+        callback(null, empleadosDesencriptados || []);
     });
-};
+};;
 
 /**
  * Actualiza el estado de un empleado

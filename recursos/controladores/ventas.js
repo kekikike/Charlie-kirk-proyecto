@@ -55,30 +55,15 @@ const crearVenta = (req, res) => {
  * Obtener lista de ventas
  */
 /**
- * Obtener lista de ventas (MODIFICADO PARA TRAER DATOS DEL CLIENTE)
+ * Obtener lista de ventas (CON CONTROL DE ACCESO)
  */
 const obtenerVentas = (req, res) => {
-    // Esta consulta trae la venta + nombre/apellido/ci del cliente + nombre/apellido del empleado + nombre del método
-    const sql = `
-        SELECT 
-            v.*, 
-            c.nombre AS cliente_nom, 
-            c.apellido AS cliente_ape, 
-            c.ci_nit,
-            e.nombre1, 
-            e.apellido1,
-            m.nombre AS metodo,
-            (SELECT COUNT(*) FROM tdetalleventa WHERE idventa = v.idventa) as cantidad_productos
-        FROM tventas v
-        LEFT JOIN tclientes c ON v.ci_nit = c.ci_nit
-        INNER JOIN templeados e ON v.ciempleado = e.ciempleado
-        INNER JOIN tmetodopago m ON v.idmetodo = m.idmetodo
-        ORDER BY v.fecharegistro DESC
-    `;
-
-    db.query(sql, (err, ventas) => {
+    const { ciempleado, rol } = req.usuario;
+    
+    // Usar el nuevo servicio con control de acceso
+    servicios.obtenerVentasConAcceso(ciempleado, rol, (err, ventas) => {
         if (err) {
-            console.error('[HISTORIAL] Error SQL:', err.message);
+            console.error('[HISTORIAL] Error:', err.message);
             return res.status(500).json({ error: err.message });
         }
         
